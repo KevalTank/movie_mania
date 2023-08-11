@@ -1,10 +1,10 @@
 // This is general status that all bloc will use
 enum Status { initial, inProgress, success, failure }
 
-// This is general status for authentication
-enum AuthStatus { initial, inProgress, authenticated, unAuthenticated }
+// This is TabBar status
+enum TabBarStatus { popular, topRated, upcoming }
 
-// Helper extension for status
+// Helper extension for Status
 extension StatusExtension on Status {
   bool get isInitial => this == Status.initial;
 
@@ -13,4 +13,13 @@ extension StatusExtension on Status {
   bool get isSuccess => this == Status.success;
 
   bool get isFailure => this == Status.failure;
+}
+
+// TabBar extension on TabBarStatus
+extension TabBarExtension on TabBarStatus {
+  bool get popular => this == TabBarStatus.popular;
+
+  bool get topRated => this == TabBarStatus.topRated;
+
+  bool get upcoming => this == TabBarStatus.upcoming;
 }
