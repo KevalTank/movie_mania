@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_mania/blocs/home_bloc.dart';
+import 'package:movie_mania/blocs/movie_bloc.dart';
 import 'package:movie_mania/constants/enums.dart';
 import 'package:movie_mania/screens/popular_movies_screen.dart';
 import 'package:movie_mania/screens/top_rated_movies_screen.dart';
@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
     required BuildContext context,
     required TabBarStatus tabBarStatus,
   }) {
-    context.read<HomeBloc>().add(
+    context.read<MovieBloc>().add(
           ChangeTabBarStatusRequested(
             tabBarStatus: tabBarStatus,
           ),
@@ -45,9 +45,9 @@ class HomeScreen extends StatelessWidget {
                   Transform.scale(
                     scale: 0.8,
                     child: Switch(
-                      value: context.watch<HomeBloc>().state.isGridView,
+                      value: context.watch<MovieBloc>().state.isGridView,
                       onChanged: (bool isGridView) {
-                        context.read<HomeBloc>().add(
+                        context.read<MovieBloc>().add(
                               ChangeGridViewToListViewRequested(
                                 isGridView: isGridView,
                               ),

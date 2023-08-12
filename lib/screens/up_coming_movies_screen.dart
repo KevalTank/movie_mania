@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_mania/blocs/home_bloc.dart';
+import 'package:movie_mania/blocs/movie_bloc.dart';
 import 'package:movie_mania/widgets/build_grid_view.dart';
 import 'package:movie_mania/widgets/build_list_view.dart';
 
@@ -10,15 +10,16 @@ class UpComingMoviesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<HomeBloc, HomeState>(
+      body: BlocBuilder<MovieBloc, MovieState>(
         buildWhen: (previous, current) =>
             previous.status != current.status ||
-            previous.isGridView != current.isGridView,
+            previous.isGridView != current.isGridView ||
+            previous.listOfUpcomingMovies != current.listOfUpcomingMovies,
         builder: (context, state) {
           if (state.isGridView) {
-            return const BuildGridView();
+            return BuildGridView(listOfMovies: state.listOfUpcomingMovies);
           }
-          return const BuildListView();
+          return BuildListView(listOfMovies: state.listOfUpcomingMovies);
         },
       ),
     );
