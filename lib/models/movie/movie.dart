@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'movie.g.dart';
@@ -6,7 +8,7 @@ part 'movie.g.dart';
 class Movie {
   final bool adult;
   @JsonKey(name: 'backdrop_path')
-  final String backdropPath;
+  final String? backdropPath;
   @JsonKey(name: 'genre_ids')
   final List<int> genreIds;
   final int id;
@@ -17,7 +19,7 @@ class Movie {
   final String overview;
   final double popularity;
   @JsonKey(name: 'poster_path')
-  final String posterPath;
+  final String? posterPath;
   @JsonKey(name: 'release_date')
   final String releaseDate;
   final String title;
@@ -29,14 +31,14 @@ class Movie {
 
   Movie({
     required this.adult,
-    required this.backdropPath,
+    this.backdropPath,
     required this.genreIds,
     required this.id,
     required this.originalLanguage,
     required this.originalTitle,
     required this.overview,
     required this.popularity,
-    required this.posterPath,
+    this.posterPath,
     required this.releaseDate,
     required this.title,
     required this.video,

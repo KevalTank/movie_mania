@@ -13,7 +13,7 @@ extension MovieRepository on AppRepository {
       var popularMovies = MovieResponse.fromJson(popularMoviesResponse);
       return popularMovies;
     } catch (e) {
-      debugPrint('Something went wrong while loading popular movies');
+      debugPrint('Something went wrong while loading popular movies -- ${e.toString()}');
       return null;
     }
   }

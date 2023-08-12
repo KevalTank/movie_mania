@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:movie_mania/blocs/movie_bloc.dart';
+import 'package:movie_mania/constants/enums.dart';
 import 'package:movie_mania/widgets/build_grid_view.dart';
 import 'package:movie_mania/widgets/build_list_view.dart';
 
@@ -16,10 +18,35 @@ class TopRatedMoviesScreen extends StatelessWidget {
             previous.isGridView != current.isGridView ||
             previous.listOfTopRatedMovies != current.listOfTopRatedMovies,
         builder: (context, state) {
-          if (state.isGridView) {
-            return BuildGridView(listOfMovies: state.listOfTopRatedMovies);
+          if(state.status.isFailure) {
+            Fluttertoast.showToast(msg: state.errorMessage);
           }
-          return BuildListView(listOfMovies: state.listOfTopRatedMovies);
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<MovieBloc>().add(
+                    const LoadTopRatedMoviesRequested(loadInitialPage: true),
+                  );
+            },
+            child: state.isGridView
+                ? BuildGridView(
+                    listOfMovies: state.listOfTopRatedMovies,
+                    onEndReached: () {
+                      debugPrint('End of grid view reached');
+                      context
+                          .read<MovieBloc>()
+                          .add(const LoadTopRatedMoviesRequested());
+                    },
+                  )
+                : BuildListView(
+                    listOfMovies: state.listOfTopRatedMovies,
+                    onEndReached: () {
+                      debugPrint('End of list view reached');
+                      context
+                          .read<MovieBloc>()
+                          .add(const LoadTopRatedMoviesRequested());
+                    },
+                  ),
+          );
         },
       ),
     );

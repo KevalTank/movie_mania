@@ -23,8 +23,26 @@ class ChangeTabBarStatusRequested extends MovieEvent {
   final TabBarStatus tabBarStatus;
 }
 
-class LoadPopularMoviesRequested extends MovieEvent {}
+class LoadPopularMoviesRequested extends MovieEvent {
+  const LoadPopularMoviesRequested({
+    this.loadInitialPage,
+  });
 
-class LoadTopRatedMoviesRequested extends MovieEvent {}
+  final bool? loadInitialPage;
+}
 
-class LoadUpcomingMoviesRequested extends MovieEvent {}
+class LoadTopRatedMoviesRequested extends MovieEvent {
+  const LoadTopRatedMoviesRequested({
+    this.loadInitialPage,
+  });
+
+  final bool? loadInitialPage;
+}
+
+class LoadUpcomingMoviesRequested extends MovieEvent {
+  const LoadUpcomingMoviesRequested({
+    this.loadInitialPage,
+  });
+
+  final bool? loadInitialPage;
+}
