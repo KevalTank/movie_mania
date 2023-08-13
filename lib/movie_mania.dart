@@ -31,7 +31,7 @@ class MovieMania extends StatelessWidget {
           return MaterialApp(
             title: 'Movie Mania',
             theme: ThemeData.light(useMaterial3: true),
-            home: const HomeScreen(),
+            home: HomeScreen(),
           );
         },
       ),

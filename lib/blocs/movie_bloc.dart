@@ -25,6 +25,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     on<LoadPopularMoviesRequested>(_onLoadPopularMovieRequested);
     on<LoadTopRatedMoviesRequested>(_onLoadTopRatedMoviesRequested);
     on<LoadUpcomingMoviesRequested>(_onLoadUpcomingMoviesRequested);
+    on<UserSearchMovieRequested>(_onUserSearchMovieRequested);
   }
 
   final AppRepository _appRepository;
@@ -39,8 +40,11 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
   int totalPagesForUpComingMovies = 10;
 
   List<Movie> _popularMoviesList = [];
+  List<Movie> _searchPopularMoviesList = [];
   List<Movie> _topRatedMoviesList = [];
+  List<Movie> _searchTopRatedMoviesList = [];
   List<Movie> _upComingMoviesList = [];
+  List<Movie> _searchUpComingMoviesList = [];
 
   FutureOr<void> _onChangeGridViewToListViewRequested(
     ChangeGridViewToListViewRequested event,
@@ -54,6 +58,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     Emitter<MovieState> emit,
   ) {
     emit(state.copyWith(tabBarStatus: event.tabBarStatus));
+    add(UserSearchMovieRequested(movieName: event.movieName));
   }
 
   FutureOr<void> _onLoadPopularMovieRequested(
@@ -200,6 +205,76 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
               status: Status.failure,
               errorMessage:
                   'Something went wrong while loading upcoming movies'),
+        );
+      }
+    }
+  }
+
+  FutureOr<void> _onUserSearchMovieRequested(
+    UserSearchMovieRequested event,
+    Emitter<MovieState> emit,
+  ) {
+    if (state.tabBarStatus.popular) {
+      if (event.movieName.isNotEmpty) {
+        _searchPopularMoviesList = [..._popularMoviesList]
+            .where((movie) => movie.title
+                .toLowerCase()
+                .contains(event.movieName.toLowerCase()))
+            .toList();
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfPopularMovies: _searchPopularMoviesList,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfPopularMovies: _popularMoviesList,
+          ),
+        );
+      }
+    } else if (state.tabBarStatus.topRated) {
+      if (event.movieName.isNotEmpty) {
+        _searchTopRatedMoviesList = [..._topRatedMoviesList]
+            .where((movie) => movie.title
+                .toLowerCase()
+                .contains(event.movieName.toLowerCase()))
+            .toList();
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfTopRatedMovies: _searchTopRatedMoviesList,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfTopRatedMovies: _topRatedMoviesList,
+          ),
+        );
+      }
+    } else {
+      if (event.movieName.isNotEmpty) {
+        _searchUpComingMoviesList = [..._upComingMoviesList]
+            .where((movie) => movie.title
+                .toLowerCase()
+                .contains(event.movieName.toLowerCase()))
+            .toList();
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfUpcomingMovies: _searchUpComingMoviesList,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfUpcomingMovies: _upComingMoviesList,
+          ),
         );
       }
     }

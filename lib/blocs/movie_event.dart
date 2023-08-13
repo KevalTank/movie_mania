@@ -18,9 +18,11 @@ class ChangeGridViewToListViewRequested extends MovieEvent {
 class ChangeTabBarStatusRequested extends MovieEvent {
   const ChangeTabBarStatusRequested({
     required this.tabBarStatus,
+    required this.movieName,
   });
 
   final TabBarStatus tabBarStatus;
+  final String movieName;
 }
 
 class LoadPopularMoviesRequested extends MovieEvent {
@@ -45,4 +47,12 @@ class LoadUpcomingMoviesRequested extends MovieEvent {
   });
 
   final bool? loadInitialPage;
+}
+
+class UserSearchMovieRequested extends MovieEvent {
+  const UserSearchMovieRequested({
+    required this.movieName,
+  });
+
+  final String movieName;
 }

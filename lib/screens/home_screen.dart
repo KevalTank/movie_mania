@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_mania/blocs/movie_bloc.dart';
+import 'package:movie_mania/constants/app_colors.dart';
 import 'package:movie_mania/constants/enums.dart';
 import 'package:movie_mania/screens/popular_movies_screen.dart';
 import 'package:movie_mania/screens/top_rated_movies_screen.dart';
 import 'package:movie_mania/screens/up_coming_movies_screen.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
+import 'package:movie_mania/widgets/unfocus_wrapper.dart';
 import 'package:sizer/sizer.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final TextEditingController searchController = TextEditingController();
 
   void changeTabRequested({
     required BuildContext context,
@@ -18,6 +22,7 @@ class HomeScreen extends StatelessWidget {
     context.read<MovieBloc>().add(
           ChangeTabBarStatusRequested(
             tabBarStatus: tabBarStatus,
+            movieName: searchController.text,
           ),
         );
   }
@@ -26,82 +31,120 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: CustomText(
-            text: 'Movie Mania',
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w700,
-          ),
-          actions: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4.w),
-              child: Row(
-                children: [
-                  const CustomText(
-                    text: 'GridView',
-                    fontWeight: FontWeight.w600,
-                  ),
-                  Transform.scale(
-                    scale: 0.8,
-                    child: Switch(
-                      value: context.watch<MovieBloc>().state.isGridView,
-                      onChanged: (bool isGridView) {
-                        context.read<MovieBloc>().add(
-                              ChangeGridViewToListViewRequested(
-                                isGridView: isGridView,
-                              ),
-                            );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+      child: UnFocusWrapper(
+        child: Scaffold(
+          appBar: AppBar(
+            title: CustomText(
+              text: 'Movie Mania',
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w700,
             ),
-          ],
-          bottom: TabBar(
-            onTap: (int tabIndex) {
-              switch (tabIndex) {
-                case 0:
-                  changeTabRequested(
-                    context: context,
-                    tabBarStatus: TabBarStatus.popular,
-                  );
-                  break;
-                case 1:
-                  changeTabRequested(
-                    context: context,
-                    tabBarStatus: TabBarStatus.topRated,
-                  );
-                  break;
-                case 2:
-                  changeTabRequested(
-                    context: context,
-                    tabBarStatus: TabBarStatus.upcoming,
-                  );
-                  break;
-                default:
-                  changeTabRequested(
-                    context: context,
-                    tabBarStatus: TabBarStatus.popular,
-                  );
-                  break;
-              }
-            },
-            tabs: const [
-              Tab(icon: Text('Popular')),
-              Tab(icon: Text('Top Rated')),
-              Tab(icon: Text('Upcoming')),
+            actions: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 2.w),
+                child: Row(
+                  children: [
+                    const CustomText(
+                      text: 'GridView',
+                      fontWeight: FontWeight.w600,
+                    ),
+                    Transform.scale(
+                      scale: 0.8,
+                      child: Switch(
+                        value: context.watch<MovieBloc>().state.isGridView,
+                        onChanged: (bool isGridView) {
+                          context.read<MovieBloc>().add(
+                                ChangeGridViewToListViewRequested(
+                                  isGridView: isGridView,
+                                ),
+                              );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            bottom: TabBar(
+              onTap: (int tabIndex) {
+                switch (tabIndex) {
+                  case 0:
+                    changeTabRequested(
+                      context: context,
+                      tabBarStatus: TabBarStatus.popular,
+                    );
+                    break;
+                  case 1:
+                    changeTabRequested(
+                      context: context,
+                      tabBarStatus: TabBarStatus.topRated,
+                    );
+                    break;
+                  case 2:
+                    changeTabRequested(
+                      context: context,
+                      tabBarStatus: TabBarStatus.upcoming,
+                    );
+                    break;
+                  default:
+                    changeTabRequested(
+                      context: context,
+                      tabBarStatus: TabBarStatus.popular,
+                    );
+                    break;
+                }
+              },
+              tabs: const [
+                Tab(icon: Text('Popular')),
+                Tab(icon: Text('Top Rated')),
+                Tab(icon: Text('Upcoming')),
+              ],
+            ),
+          ),
+          body: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                child: TextField(
+                  controller: searchController,
+                  onChanged: (String movieName) {
+                    context.read<MovieBloc>().add(
+                          UserSearchMovieRequested(movieName: movieName),
+                        );
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Search Movies...',
+                    hintStyle: const TextStyle(color: AppColors.blackColor),
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: AppColors.whiteColor,
+                    suffixIcon: searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              searchController.clear();
+                              context.read<MovieBloc>().add(
+                                    const UserSearchMovieRequested(
+                                        movieName: ''),
+                                  );
+                            },
+                          )
+                        : null,
+                  ),
+                ),
+              ),
+              const Expanded(
+                child: TabBarView(
+                  physics: NeverScrollableScrollPhysics(),
+                  children: [
+                    PopularMoviesScreen(),
+                    TopRatedMoviesScreen(),
+                    UpComingMoviesScreen(),
+                  ],
+                ),
+              ),
             ],
           ),
-        ),
-        body: const TabBarView(
-          physics: NeverScrollableScrollPhysics(),
-          children: [
-            PopularMoviesScreen(),
-            TopRatedMoviesScreen(),
-            UpComingMoviesScreen(),
-          ],
         ),
       ),
     );
