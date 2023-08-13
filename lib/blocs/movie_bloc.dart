@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/enums.dart';
+import 'package:movie_mania/constants/shared_preferences_constants.dart';
 import 'package:movie_mania/local_storage/shared_pref_helper.dart';
 import 'package:movie_mania/models/movie/movie.dart';
 import 'package:movie_mania/repository/app_repository.dart';
@@ -72,62 +73,79 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     Emitter<MovieState> emit,
   ) async {
     emit(state.copyWith(status: Status.inProgress));
-    debugPrint(
-        'Before fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
-    if (event.loadInitialPage ?? false) {
-      popularMoviesCurrentPage = 1;
-      _genreListForPopularMovies = [];
-      debugPrint(
-          'First time fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
-    }
-    if (popularMoviesCurrentPage >= totalPagesForPopularMovies) {
+    List<Movie> listOfPopularMoviesFromPref =
+        await _prefHelper.getMoviesListFromPreferencesRequested(
+            collectionName: SharedPreferencesConstants.popularMovies);
+    if (listOfPopularMoviesFromPref.isNotEmpty &&
+        (event.loadInitialPage ?? false)) {
       emit(
         state.copyWith(
-          status: Status.failure,
-          errorMessage: 'You have reached to the end of the list',
+          status: Status.success,
+          listOfPopularMovies: listOfPopularMoviesFromPref,
         ),
       );
     } else {
-      var moviesResponse = await _appRepository.loadMovies(
-        endPoint: ApiConstants.popular,
-        page: popularMoviesCurrentPage,
-      );
-      if (moviesResponse != null) {
-        if (event.loadInitialPage ?? false) {
-          _popularMoviesList = [];
-        }
-        _popularMoviesList.addAll(moviesResponse.results);
-        totalPagesForPopularMovies = moviesResponse.totalPages;
-        for (int i = 0; i < _popularMoviesList.length; i++) {
-          if (_popularMoviesList[i].genreIds.isNotEmpty) {
-            _genreListForPopularMovies.addAll(_popularMoviesList[i].genreIds);
-          }
-        }
+      debugPrint(
+          'Before fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
+      if (event.loadInitialPage ?? false) {
+        popularMoviesCurrentPage = 1;
+        _genreListForPopularMovies = [];
         debugPrint(
-            'Length of the genre id == ${_genreListForPopularMovies.length}');
-        debugPrint(
-            'Before calling to set on list ----------- ${_genreListForPopularMovies.length}');
-        _genreListForPopularMovies =
-            _genreListForPopularMovies.toSet().toList();
-        debugPrint(
-            'After calling to set on list ----------- ${_genreListForPopularMovies.length}');
+            'First time fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
+      }
+      if (popularMoviesCurrentPage >= totalPagesForPopularMovies) {
         emit(
           state.copyWith(
-            status: Status.success,
-            listOfPopularMovies: _popularMoviesList,
-            genreIdsForPopular: _genreListForPopularMovies,
+            status: Status.failure,
+            errorMessage: 'You have reached to the end of the list',
           ),
         );
-        popularMoviesCurrentPage++;
-        debugPrint(
-            'After fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
       } else {
-        emit(
-          state.copyWith(
-              status: Status.failure,
-              errorMessage:
-                  'Something went wrong while loading popular movies'),
+        var moviesResponse = await _appRepository.loadMovies(
+          endPoint: ApiConstants.popular,
+          page: popularMoviesCurrentPage,
         );
+        if (moviesResponse != null) {
+          if (event.loadInitialPage ?? false) {
+            _popularMoviesList = [];
+          }
+          _popularMoviesList.addAll(moviesResponse.results);
+          totalPagesForPopularMovies = moviesResponse.totalPages;
+          for (int i = 0; i < _popularMoviesList.length; i++) {
+            if (_popularMoviesList[i].genreIds.isNotEmpty) {
+              _genreListForPopularMovies.addAll(_popularMoviesList[i].genreIds);
+            }
+          }
+          debugPrint(
+              'Length of the genre id == ${_genreListForPopularMovies.length}');
+          debugPrint(
+              'Before calling to set on list ----------- ${_genreListForPopularMovies.length}');
+          _genreListForPopularMovies =
+              _genreListForPopularMovies.toSet().toList();
+          debugPrint(
+              'After calling to set on list ----------- ${_genreListForPopularMovies.length}');
+          await _prefHelper.saveMoviesToPreferencesRequested(
+            listOfMovies: _popularMoviesList,
+            collectionName: SharedPreferencesConstants.popularMovies,
+          );
+          emit(
+            state.copyWith(
+              status: Status.success,
+              listOfPopularMovies: _popularMoviesList,
+              genreIdsForPopular: _genreListForPopularMovies,
+            ),
+          );
+          popularMoviesCurrentPage++;
+          debugPrint(
+              'After fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
+        } else {
+          emit(
+            state.copyWith(
+                status: Status.failure,
+                errorMessage:
+                    'Something went wrong while loading popular movies'),
+          );
+        }
       }
     }
   }
@@ -137,59 +155,73 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     Emitter<MovieState> emit,
   ) async {
     emit(state.copyWith(status: Status.inProgress));
-    debugPrint(
-        'Before fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
-    if (event.loadInitialPage ?? false) {
-      topRatedMoviesCurrentPage = 1;
-      _genreListForTopRatedMovies = [];
-      debugPrint(
-          'First time fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
-    }
-    if (topRatedMoviesCurrentPage >= totalPagesForTopRatedMovies) {
+    List<Movie> listOfTopRatedMoviesFromPref =
+        await _prefHelper.getMoviesListFromPreferencesRequested(
+            collectionName: SharedPreferencesConstants.topRatedMovies);
+    if (listOfTopRatedMoviesFromPref.isNotEmpty &&
+        (event.loadInitialPage ?? false)) {
       emit(
         state.copyWith(
-            status: Status.failure,
-            errorMessage: 'You have reached to the end of the list'),
+          status: Status.success,
+          listOfTopRatedMovies: listOfTopRatedMoviesFromPref,
+        ),
       );
     } else {
-      var moviesResponse = await _appRepository.loadMovies(
-        endPoint: ApiConstants.topRated,
-        page: topRatedMoviesCurrentPage,
-      );
-      if (moviesResponse != null) {
-        if (event.loadInitialPage ?? false) {
-          _topRatedMoviesList = [];
-        }
-        _topRatedMoviesList.addAll(moviesResponse.results);
-        totalPagesForTopRatedMovies = moviesResponse.totalPages;
-        for (int i = 0; i < _topRatedMoviesList.length; i++) {
-          if (_topRatedMoviesList[i].genreIds.isNotEmpty) {
-            _genreListForTopRatedMovies.addAll(_topRatedMoviesList[i].genreIds);
-          }
-        }
-        _genreListForTopRatedMovies =
-            _genreListForTopRatedMovies.toSet().toList();
-        emit(
-          state.copyWith(
-            status: Status.success,
-            listOfTopRatedMovies: _topRatedMoviesList,
-            genreIdsForTopRated: _genreListForTopRatedMovies,
-          ),
-        );
-        topRatedMoviesCurrentPage++;
-        // await _prefHelper.saveMoviesToPreferencesRequested(
-        //   listOfMovies: _topRatedMoviesList,
-        //   collectionName: SharedPreferencesConstants.topRatedMovies,
-        // );
+      debugPrint(
+          'Before fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
+      if (event.loadInitialPage ?? false) {
+        topRatedMoviesCurrentPage = 1;
+        _genreListForTopRatedMovies = [];
         debugPrint(
-            'After fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
-      } else {
+            'First time fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
+      }
+      if (topRatedMoviesCurrentPage >= totalPagesForTopRatedMovies) {
         emit(
           state.copyWith(
               status: Status.failure,
-              errorMessage:
-                  'Something went wrong while loading top rated movies'),
+              errorMessage: 'You have reached to the end of the list'),
         );
+      } else {
+        var moviesResponse = await _appRepository.loadMovies(
+          endPoint: ApiConstants.topRated,
+          page: topRatedMoviesCurrentPage,
+        );
+        if (moviesResponse != null) {
+          if (event.loadInitialPage ?? false) {
+            _topRatedMoviesList = [];
+          }
+          _topRatedMoviesList.addAll(moviesResponse.results);
+          totalPagesForTopRatedMovies = moviesResponse.totalPages;
+          for (int i = 0; i < _topRatedMoviesList.length; i++) {
+            if (_topRatedMoviesList[i].genreIds.isNotEmpty) {
+              _genreListForTopRatedMovies
+                  .addAll(_topRatedMoviesList[i].genreIds);
+            }
+          }
+          _genreListForTopRatedMovies =
+              _genreListForTopRatedMovies.toSet().toList();
+          emit(
+            state.copyWith(
+              status: Status.success,
+              listOfTopRatedMovies: _topRatedMoviesList,
+              genreIdsForTopRated: _genreListForTopRatedMovies,
+            ),
+          );
+          topRatedMoviesCurrentPage++;
+          await _prefHelper.saveMoviesToPreferencesRequested(
+            listOfMovies: _topRatedMoviesList,
+            collectionName: SharedPreferencesConstants.topRatedMovies,
+          );
+          debugPrint(
+              'After fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
+        } else {
+          emit(
+            state.copyWith(
+                status: Status.failure,
+                errorMessage:
+                    'Something went wrong while loading top rated movies'),
+          );
+        }
       }
     }
   }
@@ -199,60 +231,73 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     Emitter<MovieState> emit,
   ) async {
     emit(state.copyWith(status: Status.inProgress));
-    debugPrint(
-        'Before fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
-    if (event.loadInitialPage ?? false) {
-      upComingMoviesCurrentPage = 1;
-      _genreListForUpComingMovies = [];
-      debugPrint(
-          'First time fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
-    }
-    if (upComingMoviesCurrentPage >= totalPagesForUpComingMovies) {
+    List<Movie> listOfUpComingMoviesFromPref =
+        await _prefHelper.getMoviesListFromPreferencesRequested(
+            collectionName: SharedPreferencesConstants.upComingMovies);
+    if (listOfUpComingMoviesFromPref.isNotEmpty &&
+        (event.loadInitialPage ?? false)) {
       emit(
         state.copyWith(
-          status: Status.failure,
-          errorMessage: 'You have reached to the end of the list',
-        ),
+            status: Status.success,
+            listOfUpcomingMovies: listOfUpComingMoviesFromPref),
       );
     } else {
-      var moviesResponse = await _appRepository.loadMovies(
-        endPoint: ApiConstants.upcoming,
-        page: upComingMoviesCurrentPage,
-      );
-      if (moviesResponse != null) {
-        if (event.loadInitialPage ?? false) {
-          _upComingMoviesList = [];
-        }
-        _upComingMoviesList.addAll(moviesResponse.results);
-        totalPagesForUpComingMovies = moviesResponse.totalPages;
-        for (int i = 0; i < _upComingMoviesList.length; i++) {
-          if (_upComingMoviesList[i].genreIds.isNotEmpty) {
-            _genreListForUpComingMovies.addAll(_upComingMoviesList[i].genreIds);
-          }
-        }
-        _genreListForUpComingMovies =
-            _genreListForUpComingMovies.toSet().toList();
+      debugPrint(
+          'Before fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
+      if (event.loadInitialPage ?? false) {
+        upComingMoviesCurrentPage = 1;
+        _genreListForUpComingMovies = [];
+        debugPrint(
+            'First time fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
+      }
+      if (upComingMoviesCurrentPage >= totalPagesForUpComingMovies) {
         emit(
           state.copyWith(
-            status: Status.success,
-            listOfUpcomingMovies: _upComingMoviesList,
-            genreIdsForUpComing: _genreListForUpComingMovies,
+            status: Status.failure,
+            errorMessage: 'You have reached to the end of the list',
           ),
         );
-        upComingMoviesCurrentPage++;
-        // await _prefHelper.saveMoviesToPreferencesRequested(
-        //   listOfMovies: _upComingMoviesList,
-        //   collectionName: SharedPreferencesConstants.upComingMovies,
-        // );
-        debugPrint(
-            'After fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
       } else {
-        emit(
-          state.copyWith(
-              status: Status.failure,
-              errorMessage:
-                  'Something went wrong while loading upcoming movies'),
+        var moviesResponse = await _appRepository.loadMovies(
+          endPoint: ApiConstants.upcoming,
+          page: upComingMoviesCurrentPage,
         );
+        if (moviesResponse != null) {
+          if (event.loadInitialPage ?? false) {
+            _upComingMoviesList = [];
+          }
+          _upComingMoviesList.addAll(moviesResponse.results);
+          totalPagesForUpComingMovies = moviesResponse.totalPages;
+          for (int i = 0; i < _upComingMoviesList.length; i++) {
+            if (_upComingMoviesList[i].genreIds.isNotEmpty) {
+              _genreListForUpComingMovies
+                  .addAll(_upComingMoviesList[i].genreIds);
+            }
+          }
+          _genreListForUpComingMovies =
+              _genreListForUpComingMovies.toSet().toList();
+          emit(
+            state.copyWith(
+              status: Status.success,
+              listOfUpcomingMovies: _upComingMoviesList,
+              genreIdsForUpComing: _genreListForUpComingMovies,
+            ),
+          );
+          upComingMoviesCurrentPage++;
+          await _prefHelper.saveMoviesToPreferencesRequested(
+            listOfMovies: _upComingMoviesList,
+            collectionName: SharedPreferencesConstants.upComingMovies,
+          );
+          debugPrint(
+              'After fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
+        } else {
+          emit(
+            state.copyWith(
+                status: Status.failure,
+                errorMessage:
+                    'Something went wrong while loading upcoming movies'),
+          );
+        }
       }
     }
   }

@@ -20,9 +20,9 @@ class MovieMania extends StatelessWidget {
         BlocProvider(
           create: (context) =>
               MovieBloc(appRepository: _appRepository, prefHelper: _prefHelper)
-                ..add(const LoadPopularMoviesRequested())
-                ..add(const LoadTopRatedMoviesRequested())
-                ..add(const LoadUpcomingMoviesRequested()),
+                ..add(const LoadPopularMoviesRequested(loadInitialPage: true))
+                ..add(const LoadTopRatedMoviesRequested(loadInitialPage: true))
+                ..add(const LoadUpcomingMoviesRequested(loadInitialPage: true)),
           lazy: false,
         ),
       ],
