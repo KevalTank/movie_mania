@@ -10,11 +10,13 @@ import 'package:sizer/sizer.dart';
 class MovieMania extends StatelessWidget {
   MovieMania({super.key});
 
+  // Gets the app repository and preferences
   final _appRepository = getIt.get<AppRepository>();
   final _prefHelper = getIt.get<SharedPrefHelper>();
 
   @override
   Widget build(BuildContext context) {
+    // Initialize blocs
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -26,6 +28,7 @@ class MovieMania extends StatelessWidget {
           lazy: false,
         ),
       ],
+      // Initialize sizer
       child: Sizer(
         builder: (context, orientation, deviceType) {
           return MaterialApp(

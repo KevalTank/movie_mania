@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Helps to close keyboard or un-focus text fields
+// Helps to close keyboard or un-focus text fields
 class UnFocusWrapper extends StatelessWidget {
   const UnFocusWrapper({super.key, required this.child});
 

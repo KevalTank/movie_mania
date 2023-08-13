@@ -1,5 +1,6 @@
 part of 'movie_bloc.dart';
 
+// State variables
 class MovieState extends Equatable {
   const MovieState({
     this.status = Status.initial,

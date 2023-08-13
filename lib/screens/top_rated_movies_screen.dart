@@ -23,6 +23,7 @@ class TopRatedMoviesScreen extends StatelessWidget {
           }
           return RefreshIndicator(
             onRefresh: () async {
+              // Load top rated movies
               context.read<MovieBloc>().add(
                     const LoadTopRatedMoviesRequested(loadInitialPage: true),
                   );
@@ -31,7 +32,7 @@ class TopRatedMoviesScreen extends StatelessWidget {
                 ? BuildGridView(
                     listOfMovies: state.listOfTopRatedMovies,
                     onEndReached: () {
-                      debugPrint('End of grid view reached');
+                      // Load more movies
                       context
                           .read<MovieBloc>()
                           .add(const LoadTopRatedMoviesRequested());
@@ -40,7 +41,7 @@ class TopRatedMoviesScreen extends StatelessWidget {
                 : BuildListView(
                     listOfMovies: state.listOfTopRatedMovies,
                     onEndReached: () {
-                      debugPrint('End of list view reached');
+                      // Load more movies
                       context
                           .read<MovieBloc>()
                           .add(const LoadTopRatedMoviesRequested());

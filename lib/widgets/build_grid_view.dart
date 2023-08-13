@@ -28,16 +28,19 @@ class _BuildGridViewState extends State<BuildGridView> {
   @override
   void initState() {
     super.initState();
+    // Set listener
     _scrollController.addListener(() => _scrollListener());
   }
 
   void _scrollListener() {
+    // Check if list is scrolled till the end if yes then pass the call back
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
       widget.onEndReached();
     }
   }
 
+  // Dispose the controller
   @override
   void dispose() {
     _scrollController.dispose();
@@ -62,6 +65,7 @@ class _BuildGridViewState extends State<BuildGridView> {
         final movie = widget.listOfMovies[index];
         return GestureDetector(
           onTap: () {
+            // Take to the movie details screen
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => MovieDetailsScreen(movie: movie),

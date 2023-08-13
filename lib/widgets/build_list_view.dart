@@ -29,17 +29,19 @@ class _BuildListViewState extends State<BuildListView> {
   @override
   void initState() {
     super.initState();
+    // Set listener
     _scrollController.addListener(() => _scrollListener());
   }
 
   void _scrollListener() {
+    // Check if list is scrolled till the end if yes then pass the call back
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      debugPrint('List is half scrolled');
       widget.onEndReached();
     }
   }
 
+  // Dispose the controller
   @override
   void dispose() {
     _scrollController.dispose();
@@ -60,6 +62,7 @@ class _BuildListViewState extends State<BuildListView> {
         final movie = widget.listOfMovies[index];
         return GestureDetector(
           onTap: () {
+            // Navigate to the movie details screen
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => MovieDetailsScreen(movie: movie),

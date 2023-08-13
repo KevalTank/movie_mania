@@ -35,6 +35,7 @@ class DioHttpService {
         receiveTimeout: ApiConstants.defaultReceiveTimeout,
       );
 
+  // Set the token for PAI call
   final _options =
       Options(headers: {'Authorization': 'Bearer ${ApiConstants.apiToken}'});
 

@@ -1,8 +1,11 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:movie_mania/models/movie/movie.dart';
 
 part 'movie_response.g.dart';
 
+// Movie API response
 @JsonSerializable()
 class MovieResponse {
   final int page;

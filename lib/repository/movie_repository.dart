@@ -1,6 +1,8 @@
 part of 'app_repository.dart';
 
+// Extension of app repository
 extension MovieRepository on AppRepository {
+  // Load movies
   Future<MovieResponse?> loadMovies({
     required String endPoint,
     required int page,
@@ -8,8 +10,6 @@ extension MovieRepository on AppRepository {
     try {
       final updatedEndPoint = '$endPoint?language=en-US&page=$page';
       final popularMoviesResponse = await _dioHttpService.get(updatedEndPoint);
-      debugPrint(
-          'Response for the popular movies = ${popularMoviesResponse.toString()}');
       var popularMovies = MovieResponse.fromJson(popularMoviesResponse);
       return popularMovies;
     } catch (e) {

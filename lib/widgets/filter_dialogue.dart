@@ -9,16 +9,23 @@ import 'package:movie_mania/widgets/custom_text.dart';
 import 'package:movie_mania/widgets/gap.dart';
 import 'package:sizer/sizer.dart';
 
+// Filter dialogue
 Future<void> filterDialogue({
   required BuildContext context,
 }) async {
+  // Get the current tab bar status
   var tabStatus = context.read<MovieBloc>().state.tabBarStatus.name;
   List<int> genreIds = [];
+  // Get popular list's genre ids
   if (tabStatus == TabBarStatus.popular.name) {
     genreIds = context.read<MovieBloc>().state.genreIdsForPopular;
-  } else if (tabStatus == TabBarStatus.topRated.name) {
+  }
+  // Get top rated list's genre ids
+  else if (tabStatus == TabBarStatus.topRated.name) {
     genreIds = context.read<MovieBloc>().state.genreIdsForTopRated;
-  } else {
+  }
+  // Get up-coming list's genre ids
+  else {
     genreIds = context.read<MovieBloc>().state.genreIdsForUpComing;
   }
   await showDialog(
@@ -26,7 +33,6 @@ Future<void> filterDialogue({
     barrierDismissible: false,
     builder: (ctx) {
       final movieBloc = BlocProvider.of<MovieBloc>(context);
-      debugPrint('Genre Ids Length === ${genreIds.length}');
       return BlocProvider.value(
         value: movieBloc,
         child: FilterDialogue(
@@ -34,6 +40,7 @@ Future<void> filterDialogue({
           optionsList: genreIds,
           selectedOption: genreIds.isNotEmpty ? genreIds[0].toString() : null,
           onApplyFilter: (String? selectedOption) {
+            // Apply filter
             context.read<MovieBloc>().add(
                   ApplyFilterRequested(
                     filter: selectedOption.toString(),
@@ -41,6 +48,7 @@ Future<void> filterDialogue({
                 );
           },
           onClearFilter: () {
+            // Clear filter
             context.read<MovieBloc>().add(
                   const ApplyFilterRequested(filter: ''),
                 );
@@ -51,6 +59,7 @@ Future<void> filterDialogue({
   );
 }
 
+// Filter dialogue
 class FilterDialogue extends StatefulWidget {
   const FilterDialogue({
     super.key,
@@ -148,6 +157,7 @@ class _FilterDialogueState extends State<FilterDialogue> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
+                          // Call back for clear filter
                           widget.onClearFilter.call();
                           Navigator.of(context).pop();
                         },
@@ -156,6 +166,7 @@ class _FilterDialogueState extends State<FilterDialogue> {
                       const Gap(),
                       ElevatedButton(
                         onPressed: () {
+                          // Call back for filter applied
                           widget.onApplyFilter.call(selectedDropdownOption);
                           Navigator.of(context).pop();
                         },

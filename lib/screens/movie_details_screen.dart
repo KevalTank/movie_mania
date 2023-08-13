@@ -50,6 +50,7 @@ class MovieDetailsScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
+          // Set movie image to the whole screen
           Opacity(
             opacity: 0.8,
             child: OptimizedCacheImage(
@@ -80,6 +81,7 @@ class MovieDetailsScreen extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
+          // Show other contents
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 4.w),
             child: SingleChildScrollView(
@@ -125,6 +127,7 @@ class MovieDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
+      // FAB
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Fluttertoast.showToast(msg: 'Book Ticket');
@@ -135,6 +138,7 @@ class MovieDetailsScreen extends StatelessWidget {
   }
 }
 
+// Helper class
 class BuildMovieInfoWithTitle extends StatelessWidget {
   const BuildMovieInfoWithTitle({
     Key? key,

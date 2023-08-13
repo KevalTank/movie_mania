@@ -4,6 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'movie.g.dart';
 
+// Movie model
 @JsonSerializable()
 class Movie {
   final bool adult;

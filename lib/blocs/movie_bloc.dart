@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/enums.dart';
@@ -30,29 +29,36 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     on<ApplyFilterRequested>(_onApplyFilterRequested);
   }
 
+  // Created instants
   final AppRepository _appRepository;
   final SharedPrefHelper _prefHelper;
 
+  // Holds the index for calling API
   int popularMoviesCurrentPage = 1;
   int topRatedMoviesCurrentPage = 1;
   int upComingMoviesCurrentPage = 1;
 
+  // Holds the total pages initially given 10
   int totalPagesForPopularMovies = 10;
   int totalPagesForTopRatedMovies = 10;
   int totalPagesForUpComingMovies = 10;
 
+  // Holds the list of the movies based on their categories
   List<Movie> _popularMoviesList = [];
   List<Movie> _topRatedMoviesList = [];
   List<Movie> _upComingMoviesList = [];
 
+  // Holds the list of movies based on user search
   List<Movie> _searchPopularMoviesList = [];
   List<Movie> _searchTopRatedMoviesList = [];
   List<Movie> _searchUpComingMoviesList = [];
 
+  // Holds the list of the genre for the filtration
   List<int> _genreListForPopularMovies = [];
   List<int> _genreListForTopRatedMovies = [];
   List<int> _genreListForUpComingMovies = [];
 
+  // Change the state form grid view to list view
   FutureOr<void> _onChangeGridViewToListViewRequested(
     ChangeGridViewToListViewRequested event,
     Emitter<MovieState> emit,
@@ -60,6 +66,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     emit(state.copyWith(isGridView: event.isGridView));
   }
 
+  // Change the tab of the screen
   FutureOr<void> _onChangeTabBarStatusRequested(
     ChangeTabBarStatusRequested event,
     Emitter<MovieState> emit,
@@ -68,14 +75,19 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     add(UserSearchMovieRequested(movieName: event.movieName));
   }
 
+  // Load the popular movies
   FutureOr<void> _onLoadPopularMovieRequested(
     LoadPopularMoviesRequested event,
     Emitter<MovieState> emit,
   ) async {
     emit(state.copyWith(status: Status.inProgress));
+    // Check in the preferences if list of popular movies is available
     List<Movie> listOfPopularMoviesFromPref =
         await _prefHelper.getMoviesListFromPreferencesRequested(
-            collectionName: SharedPreferencesConstants.popularMovies);
+      collectionName: SharedPreferencesConstants.popularMovies,
+    );
+    // If list of the popular movies is available
+    // and its not calling for the first time then return the list from the preferences
     if (listOfPopularMoviesFromPref.isNotEmpty &&
         (event.loadInitialPage ?? false)) {
       emit(
@@ -84,15 +96,17 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
           listOfPopularMovies: listOfPopularMoviesFromPref,
         ),
       );
-    } else {
-      debugPrint(
-          'Before fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
+    }
+    // Either it is first time or loading more movies
+    else {
+      // If user refresh/reload the popular movies
+      // Then load the first page for the API, and reset the genre list
       if (event.loadInitialPage ?? false) {
         popularMoviesCurrentPage = 1;
         _genreListForPopularMovies = [];
-        debugPrint(
-            'First time fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
       }
+      // Check if the current page index of the popular movies is
+      // The limit of the API then show error message
       if (popularMoviesCurrentPage >= totalPagesForPopularMovies) {
         emit(
           state.copyWith(
@@ -100,34 +114,40 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
             errorMessage: 'You have reached to the end of the list',
           ),
         );
-      } else {
+      }
+      // If goes here that means still user can fetch the movies
+      else {
+        // Call the API
         var moviesResponse = await _appRepository.loadMovies(
           endPoint: ApiConstants.popular,
           page: popularMoviesCurrentPage,
         );
+        // Check if response is not null
         if (moviesResponse != null) {
+          // If user has refreshed/reloaded the popular movies list then,
+          // First of all set the empty list
           if (event.loadInitialPage ?? false) {
             _popularMoviesList = [];
           }
+          // Add the received list of popular movies to the state
           _popularMoviesList.addAll(moviesResponse.results);
+          // Set the final and last page number
           totalPagesForPopularMovies = moviesResponse.totalPages;
+          // Add the genre ids for the filtration
           for (int i = 0; i < _popularMoviesList.length; i++) {
             if (_popularMoviesList[i].genreIds.isNotEmpty) {
               _genreListForPopularMovies.addAll(_popularMoviesList[i].genreIds);
             }
           }
-          debugPrint(
-              'Length of the genre id == ${_genreListForPopularMovies.length}');
-          debugPrint(
-              'Before calling to set on list ----------- ${_genreListForPopularMovies.length}');
+          // Removed the redundant genre ids from the list
           _genreListForPopularMovies =
               _genreListForPopularMovies.toSet().toList();
-          debugPrint(
-              'After calling to set on list ----------- ${_genreListForPopularMovies.length}');
+          // Save the popular list of popular movies to the preferences
           await _prefHelper.saveMoviesToPreferencesRequested(
             listOfMovies: _popularMoviesList,
             collectionName: SharedPreferencesConstants.popularMovies,
           );
+          // Update the state
           emit(
             state.copyWith(
               status: Status.success,
@@ -135,29 +155,35 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
               genreIdsForPopular: _genreListForPopularMovies,
             ),
           );
+          // Increment the counter for the next API call
           popularMoviesCurrentPage++;
-          debugPrint(
-              'After fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
-        } else {
+        }
+        // Handled the failure case
+        else {
           emit(
             state.copyWith(
-                status: Status.failure,
-                errorMessage:
-                    'Something went wrong while loading popular movies'),
+              status: Status.failure,
+              errorMessage: 'Something went wrong while loading popular movies',
+            ),
           );
         }
       }
     }
   }
 
+  // Load the top rated movies
   FutureOr<void> _onLoadTopRatedMoviesRequested(
     LoadTopRatedMoviesRequested event,
     Emitter<MovieState> emit,
   ) async {
     emit(state.copyWith(status: Status.inProgress));
+    // Check in the preferences if list of top rated movies is available
     List<Movie> listOfTopRatedMoviesFromPref =
         await _prefHelper.getMoviesListFromPreferencesRequested(
-            collectionName: SharedPreferencesConstants.topRatedMovies);
+      collectionName: SharedPreferencesConstants.topRatedMovies,
+    );
+    // If list of the top rated movies is available
+    // and its not calling for the first time then return the list from the preferences
     if (listOfTopRatedMoviesFromPref.isNotEmpty &&
         (event.loadInitialPage ?? false)) {
       emit(
@@ -166,40 +192,59 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
           listOfTopRatedMovies: listOfTopRatedMoviesFromPref,
         ),
       );
-    } else {
-      debugPrint(
-          'Before fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
+    }
+    // Either it is first time or loading more movies
+    else {
+      // If user refresh/reload the top rated movies
+      // Then load the first page for the API, and reset the genre list
       if (event.loadInitialPage ?? false) {
         topRatedMoviesCurrentPage = 1;
         _genreListForTopRatedMovies = [];
-        debugPrint(
-            'First time fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
       }
+      // Check if the current page index of the top rated movies is
+      // The limit of the API then show error message
       if (topRatedMoviesCurrentPage >= totalPagesForTopRatedMovies) {
         emit(
           state.copyWith(
-              status: Status.failure,
-              errorMessage: 'You have reached to the end of the list'),
+            status: Status.failure,
+            errorMessage: 'You have reached to the end of the list',
+          ),
         );
-      } else {
+      }
+      // If goes here that means still user can fetch the movies
+      else {
+        // Call the API
         var moviesResponse = await _appRepository.loadMovies(
           endPoint: ApiConstants.topRated,
           page: topRatedMoviesCurrentPage,
         );
+        // Check if response is not null
         if (moviesResponse != null) {
+          // If user has refreshed/reloaded the top rated movies list then,
+          // First of all set the empty list
           if (event.loadInitialPage ?? false) {
             _topRatedMoviesList = [];
           }
+          // Add the received list of top rated movies to the state
           _topRatedMoviesList.addAll(moviesResponse.results);
+          // Set the final and last page number
           totalPagesForTopRatedMovies = moviesResponse.totalPages;
+          // Add the genre ids for the filtration
           for (int i = 0; i < _topRatedMoviesList.length; i++) {
             if (_topRatedMoviesList[i].genreIds.isNotEmpty) {
               _genreListForTopRatedMovies
                   .addAll(_topRatedMoviesList[i].genreIds);
             }
           }
+          // Removed the redundant genre ids from the list
           _genreListForTopRatedMovies =
               _genreListForTopRatedMovies.toSet().toList();
+          // Save the popular list of popular movies to the preferences
+          await _prefHelper.saveMoviesToPreferencesRequested(
+            listOfMovies: _topRatedMoviesList,
+            collectionName: SharedPreferencesConstants.topRatedMovies,
+          );
+          // Update the state
           emit(
             state.copyWith(
               status: Status.success,
@@ -207,49 +252,55 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
               genreIdsForTopRated: _genreListForTopRatedMovies,
             ),
           );
+          // Increment the counter for the next API call
           topRatedMoviesCurrentPage++;
-          await _prefHelper.saveMoviesToPreferencesRequested(
-            listOfMovies: _topRatedMoviesList,
-            collectionName: SharedPreferencesConstants.topRatedMovies,
-          );
-          debugPrint(
-              'After fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
-        } else {
+        }
+        // Handled the failure case
+        else {
           emit(
             state.copyWith(
-                status: Status.failure,
-                errorMessage:
-                    'Something went wrong while loading top rated movies'),
+              status: Status.failure,
+              errorMessage:
+                  'Something went wrong while loading top rated movies',
+            ),
           );
         }
       }
     }
   }
 
+  // Load the up-coming movies
   FutureOr<void> _onLoadUpcomingMoviesRequested(
     LoadUpcomingMoviesRequested event,
     Emitter<MovieState> emit,
   ) async {
     emit(state.copyWith(status: Status.inProgress));
+    // Check in the preferences if list of up-coming movies is available
     List<Movie> listOfUpComingMoviesFromPref =
         await _prefHelper.getMoviesListFromPreferencesRequested(
-            collectionName: SharedPreferencesConstants.upComingMovies);
+      collectionName: SharedPreferencesConstants.upComingMovies,
+    );
+    // If list of the up-coming movies is available
+    // and its not calling for the first time then return the list from the preferences
     if (listOfUpComingMoviesFromPref.isNotEmpty &&
         (event.loadInitialPage ?? false)) {
       emit(
         state.copyWith(
-            status: Status.success,
-            listOfUpcomingMovies: listOfUpComingMoviesFromPref),
+          status: Status.success,
+          listOfUpcomingMovies: listOfUpComingMoviesFromPref,
+        ),
       );
-    } else {
-      debugPrint(
-          'Before fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
+    }
+    // Either it is first time or loading more movies
+    else {
+      // If user refresh/reload the top rated movies
+      // Then load the first page for the API, and reset the genre list
       if (event.loadInitialPage ?? false) {
         upComingMoviesCurrentPage = 1;
         _genreListForUpComingMovies = [];
-        debugPrint(
-            'First time fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
       }
+      // Check if the current page index of the up-coming movies is
+      // The limit of the API then show error message
       if (upComingMoviesCurrentPage >= totalPagesForUpComingMovies) {
         emit(
           state.copyWith(
@@ -257,25 +308,41 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
             errorMessage: 'You have reached to the end of the list',
           ),
         );
-      } else {
+      }
+      // If goes here that means still user can fetch the movies
+      else {
+        // Call the API
         var moviesResponse = await _appRepository.loadMovies(
           endPoint: ApiConstants.upcoming,
           page: upComingMoviesCurrentPage,
         );
+        // Check if response is not null
         if (moviesResponse != null) {
+          // If user has refreshed/reloaded the up-coming movies list then,
+          // First of all set the empty list
           if (event.loadInitialPage ?? false) {
             _upComingMoviesList = [];
           }
+          // Add the received list of up-coming movies to the state
           _upComingMoviesList.addAll(moviesResponse.results);
+          // Set the final and last page number
           totalPagesForUpComingMovies = moviesResponse.totalPages;
+          // Add the genre ids for the filtration
           for (int i = 0; i < _upComingMoviesList.length; i++) {
             if (_upComingMoviesList[i].genreIds.isNotEmpty) {
               _genreListForUpComingMovies
                   .addAll(_upComingMoviesList[i].genreIds);
             }
           }
+          // Removed the redundant genre ids from the list
           _genreListForUpComingMovies =
               _genreListForUpComingMovies.toSet().toList();
+          // Save the popular list of up-coming movies to the preferences
+          await _prefHelper.saveMoviesToPreferencesRequested(
+            listOfMovies: _upComingMoviesList,
+            collectionName: SharedPreferencesConstants.upComingMovies,
+          );
+          // Update the state
           emit(
             state.copyWith(
               status: Status.success,
@@ -283,43 +350,49 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
               genreIdsForUpComing: _genreListForUpComingMovies,
             ),
           );
+          // Increment the counter for the next API call
           upComingMoviesCurrentPage++;
-          await _prefHelper.saveMoviesToPreferencesRequested(
-            listOfMovies: _upComingMoviesList,
-            collectionName: SharedPreferencesConstants.upComingMovies,
-          );
-          debugPrint(
-              'After fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
-        } else {
+        }
+        // Handled the failure case
+        else {
           emit(
             state.copyWith(
-                status: Status.failure,
-                errorMessage:
-                    'Something went wrong while loading upcoming movies'),
+              status: Status.failure,
+              errorMessage:
+                  'Something went wrong while loading upcoming movies',
+            ),
           );
         }
       }
     }
   }
 
+  // Search movie based on user entered key word
   FutureOr<void> _onUserSearchMovieRequested(
     UserSearchMovieRequested event,
     Emitter<MovieState> emit,
   ) {
+    // Check if selected tab bar is popular
     if (state.tabBarStatus.popular) {
+      // Check if search text is not empty
       if (event.movieName.isNotEmpty) {
+        // Filter the movie based on text
         _searchPopularMoviesList = [..._popularMoviesList]
             .where((movie) => movie.title
                 .toLowerCase()
                 .contains(event.movieName.toLowerCase()))
             .toList();
+        // Update state
         emit(
           state.copyWith(
             status: Status.success,
             listOfPopularMovies: _searchPopularMoviesList,
           ),
         );
-      } else {
+      }
+      // If goes here that means the search text is empty,
+      // So return the popular movie list
+      else {
         emit(
           state.copyWith(
             status: Status.success,
@@ -327,20 +400,28 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
           ),
         );
       }
-    } else if (state.tabBarStatus.topRated) {
+    }
+    // Check if selected tab bar is top rated
+    else if (state.tabBarStatus.topRated) {
+      // Check if search text is not empty
       if (event.movieName.isNotEmpty) {
+        // Filter the movie based on text
         _searchTopRatedMoviesList = [..._topRatedMoviesList]
             .where((movie) => movie.title
                 .toLowerCase()
                 .contains(event.movieName.toLowerCase()))
             .toList();
+        // Update state
         emit(
           state.copyWith(
             status: Status.success,
             listOfTopRatedMovies: _searchTopRatedMoviesList,
           ),
         );
-      } else {
+      }
+      // If goes here that means the search text is empty,
+      // So return the top rated movie list
+      else {
         emit(
           state.copyWith(
             status: Status.success,
@@ -348,20 +429,28 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
           ),
         );
       }
-    } else {
+    }
+    // If goes here that means last option up-coming
+    else {
+      // Check if search text is not empty
       if (event.movieName.isNotEmpty) {
+        // Filter the movie based on text
         _searchUpComingMoviesList = [..._upComingMoviesList]
             .where((movie) => movie.title
                 .toLowerCase()
                 .contains(event.movieName.toLowerCase()))
             .toList();
+        // Update state
         emit(
           state.copyWith(
             status: Status.success,
             listOfUpcomingMovies: _searchUpComingMoviesList,
           ),
         );
-      } else {
+      }
+      // If goes here that means the search text is empty,
+      // So return the up-coming movie list
+      else {
         emit(
           state.copyWith(
             status: Status.success,
@@ -372,38 +461,51 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     }
   }
 
+  // Filtration
   FutureOr<void> _onApplyFilterRequested(
     ApplyFilterRequested event,
     Emitter<MovieState> emit,
   ) {
+    // Check if the applied filter is not empty
     if (event.filter.isNotEmpty || event.filter != '') {
+      // Check the tab bar for popular
       if (state.tabBarStatus.popular) {
+        // Filter movies based on genre Id
         List<Movie> filteredMovieList = filterMovies(
-            filterType: event.filter, movieList: _popularMoviesList);
-        debugPrint(
-            'Length of the filtered movies == ${filteredMovieList.length}');
+          filterType: event.filter,
+          movieList: _popularMoviesList,
+        );
+        // Update state
         emit(
           state.copyWith(
             status: Status.success,
             listOfPopularMovies: filteredMovieList,
           ),
         );
-      } else if (state.tabBarStatus.topRated) {
+      }
+      // Check the tab bar for top rated
+      else if (state.tabBarStatus.topRated) {
+        // Filter movies based on genre Id
         List<Movie> filteredMovieList = filterMovies(
-            filterType: event.filter, movieList: _topRatedMoviesList);
-        debugPrint(
-            'Length of the filtered movies == ${filteredMovieList.length}');
+          filterType: event.filter,
+          movieList: _topRatedMoviesList,
+        );
+        // Update state
         emit(
           state.copyWith(
             status: Status.success,
             listOfTopRatedMovies: filteredMovieList,
           ),
         );
-      } else {
+      }
+      // If goes here that means tab is up-coming
+      else {
+        // Filter movies
         List<Movie> filteredMovieList = filterMovies(
-            filterType: event.filter, movieList: _upComingMoviesList);
-        debugPrint(
-            'Length of the filtered movies == ${filteredMovieList.length}');
+          filterType: event.filter,
+          movieList: _upComingMoviesList,
+        );
+        // Update state
         emit(
           state.copyWith(
             status: Status.success,
@@ -411,22 +513,32 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
           ),
         );
       }
-    } else {
+    }
+    // Handle case for search text is empty
+    else {
+      // Check tab bar for popular
       if (state.tabBarStatus.popular) {
+        // Update state with the whole popular list
         emit(
           state.copyWith(
             status: Status.success,
             listOfPopularMovies: _popularMoviesList,
           ),
         );
-      } else if (state.tabBarStatus.topRated) {
+      }
+      // Check tab bar for top rated
+      else if (state.tabBarStatus.topRated) {
+        // Update state with whole top rated list
         emit(
           state.copyWith(
             status: Status.success,
             listOfTopRatedMovies: _topRatedMoviesList,
           ),
         );
-      } else {
+      }
+      // For the up-coming
+      else {
+        // Update state with whole up-coming list
         emit(
           state.copyWith(
             status: Status.success,
@@ -437,6 +549,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     }
   }
 
+  // Helper method to filter the movies based on genre id
   List<Movie> filterMovies({
     required List<Movie> movieList,
     required filterType,

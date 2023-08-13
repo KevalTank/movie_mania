@@ -20,6 +20,7 @@ class HomeScreen extends StatelessWidget {
     required BuildContext context,
     required TabBarStatus tabBarStatus,
   }) {
+    // Change tab bar
     context.read<MovieBloc>().add(
           ChangeTabBarStatusRequested(
             tabBarStatus: tabBarStatus,
@@ -54,6 +55,7 @@ class HomeScreen extends StatelessWidget {
                       child: Switch(
                         value: context.watch<MovieBloc>().state.isGridView,
                         onChanged: (bool isGridView) {
+                          // Change view
                           context.read<MovieBloc>().add(
                                 ChangeGridViewToListViewRequested(
                                   isGridView: isGridView,
@@ -112,6 +114,7 @@ class HomeScreen extends StatelessWidget {
                       child: TextField(
                         controller: searchController,
                         onChanged: (String movieName) {
+                          // Search movie
                           context.read<MovieBloc>().add(
                                 UserSearchMovieRequested(movieName: movieName),
                               );
@@ -127,7 +130,9 @@ class HomeScreen extends StatelessWidget {
                               ? IconButton(
                                   icon: const Icon(Icons.clear),
                                   onPressed: () {
+                                    // Clear text from the text field
                                     searchController.clear();
+                                    // Get all the movies
                                     context.read<MovieBloc>().add(
                                           const UserSearchMovieRequested(
                                               movieName: ''),
@@ -140,6 +145,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: () {
+                        // Filter dialog
                         filterDialogue(context: context);
                       },
                       padding: EdgeInsets.all(10.sp),

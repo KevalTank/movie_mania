@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movie_mania/constants/app_colors.dart';
 import 'package:sizer/sizer.dart';
 
+// Custom text
 class CustomText extends StatelessWidget {
   const CustomText({
     super.key,

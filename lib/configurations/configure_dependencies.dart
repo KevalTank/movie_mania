@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:movie_mania/configurations/configure_dependencies.config.dart';
 
-
+// Configure dependencies
 final getIt = GetIt.instance;
 
 // Configure the dependencies

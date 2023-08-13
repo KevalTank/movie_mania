@@ -1,5 +1,6 @@
 part of 'movie_bloc.dart';
 
+// Main movie event
 class MovieEvent extends Equatable {
   const MovieEvent();
 
@@ -7,6 +8,7 @@ class MovieEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+// Change gridview to list view
 class ChangeGridViewToListViewRequested extends MovieEvent {
   const ChangeGridViewToListViewRequested({
     required this.isGridView,
@@ -15,6 +17,7 @@ class ChangeGridViewToListViewRequested extends MovieEvent {
   final bool isGridView;
 }
 
+// Change tab bar status
 class ChangeTabBarStatusRequested extends MovieEvent {
   const ChangeTabBarStatusRequested({
     required this.tabBarStatus,
@@ -25,6 +28,7 @@ class ChangeTabBarStatusRequested extends MovieEvent {
   final String movieName;
 }
 
+// Load popular movies
 class LoadPopularMoviesRequested extends MovieEvent {
   const LoadPopularMoviesRequested({
     this.loadInitialPage,
@@ -33,6 +37,7 @@ class LoadPopularMoviesRequested extends MovieEvent {
   final bool? loadInitialPage;
 }
 
+// Load top rated movies
 class LoadTopRatedMoviesRequested extends MovieEvent {
   const LoadTopRatedMoviesRequested({
     this.loadInitialPage,
@@ -41,6 +46,7 @@ class LoadTopRatedMoviesRequested extends MovieEvent {
   final bool? loadInitialPage;
 }
 
+// Load upcoming movies
 class LoadUpcomingMoviesRequested extends MovieEvent {
   const LoadUpcomingMoviesRequested({
     this.loadInitialPage,
@@ -49,6 +55,7 @@ class LoadUpcomingMoviesRequested extends MovieEvent {
   final bool? loadInitialPage;
 }
 
+// Search movie
 class UserSearchMovieRequested extends MovieEvent {
   const UserSearchMovieRequested({
     required this.movieName,
@@ -57,6 +64,7 @@ class UserSearchMovieRequested extends MovieEvent {
   final String movieName;
 }
 
+// Apply filters
 class ApplyFilterRequested extends MovieEvent {
   const ApplyFilterRequested({
     required this.filter,

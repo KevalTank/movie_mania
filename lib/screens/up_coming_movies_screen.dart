@@ -23,6 +23,7 @@ class UpComingMoviesScreen extends StatelessWidget {
           }
           return RefreshIndicator(
             onRefresh: () async {
+              // Load up-coming movies
               context.read<MovieBloc>().add(
                     const LoadUpcomingMoviesRequested(loadInitialPage: true),
                   );
@@ -31,7 +32,7 @@ class UpComingMoviesScreen extends StatelessWidget {
                 ? BuildGridView(
                     listOfMovies: state.listOfUpcomingMovies,
                     onEndReached: () {
-                      debugPrint('End of grid view reached');
+                      // Load more movies
                       context
                           .read<MovieBloc>()
                           .add(const LoadUpcomingMoviesRequested());
@@ -40,7 +41,7 @@ class UpComingMoviesScreen extends StatelessWidget {
                 : BuildListView(
                     listOfMovies: state.listOfUpcomingMovies,
                     onEndReached: () {
-                      debugPrint('End of list view reached');
+                      // Load more movies
                       context
                           .read<MovieBloc>()
                           .add(const LoadUpcomingMoviesRequested());
