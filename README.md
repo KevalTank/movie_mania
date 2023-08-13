@@ -1,4 +1,7 @@
 # Movie Details App with BLoC (TMDB API)
+ 
+[Click here to download the APK](https://drive.google.com/drive/folders/1dCebb9hD7R-jkUFRs4iP7bo6FYbtU5Mz)
+
 
 ### Packages used : 
 - ```flutter_bloc``` Dor the ```state management```.
