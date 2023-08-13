@@ -26,6 +26,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     on<LoadTopRatedMoviesRequested>(_onLoadTopRatedMoviesRequested);
     on<LoadUpcomingMoviesRequested>(_onLoadUpcomingMoviesRequested);
     on<UserSearchMovieRequested>(_onUserSearchMovieRequested);
+    on<ApplyFilterRequested>(_onApplyFilterRequested);
   }
 
   final AppRepository _appRepository;
@@ -40,11 +41,16 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
   int totalPagesForUpComingMovies = 10;
 
   List<Movie> _popularMoviesList = [];
-  List<Movie> _searchPopularMoviesList = [];
   List<Movie> _topRatedMoviesList = [];
-  List<Movie> _searchTopRatedMoviesList = [];
   List<Movie> _upComingMoviesList = [];
+
+  List<Movie> _searchPopularMoviesList = [];
+  List<Movie> _searchTopRatedMoviesList = [];
   List<Movie> _searchUpComingMoviesList = [];
+
+  List<int> _genreListForPopularMovies = [];
+  List<int> _genreListForTopRatedMovies = [];
+  List<int> _genreListForUpComingMovies = [];
 
   FutureOr<void> _onChangeGridViewToListViewRequested(
     ChangeGridViewToListViewRequested event,
@@ -70,6 +76,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         'Before fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
     if (event.loadInitialPage ?? false) {
       popularMoviesCurrentPage = 1;
+      _genreListForPopularMovies = [];
       debugPrint(
           'First time fetching API response current page value for the popular movies = $popularMoviesCurrentPage');
     }
@@ -91,10 +98,24 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         }
         _popularMoviesList.addAll(moviesResponse.results);
         totalPagesForPopularMovies = moviesResponse.totalPages;
+        for (int i = 0; i < _popularMoviesList.length; i++) {
+          if (_popularMoviesList[i].genreIds.isNotEmpty) {
+            _genreListForPopularMovies.addAll(_popularMoviesList[i].genreIds);
+          }
+        }
+        debugPrint(
+            'Length of the genre id == ${_genreListForPopularMovies.length}');
+        debugPrint(
+            'Before calling to set on list ----------- ${_genreListForPopularMovies.length}');
+        _genreListForPopularMovies =
+            _genreListForPopularMovies.toSet().toList();
+        debugPrint(
+            'After calling to set on list ----------- ${_genreListForPopularMovies.length}');
         emit(
           state.copyWith(
             status: Status.success,
             listOfPopularMovies: _popularMoviesList,
+            genreIdsForPopular: _genreListForPopularMovies,
           ),
         );
         popularMoviesCurrentPage++;
@@ -120,6 +141,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         'Before fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
     if (event.loadInitialPage ?? false) {
       topRatedMoviesCurrentPage = 1;
+      _genreListForTopRatedMovies = [];
       debugPrint(
           'First time fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
     }
@@ -140,13 +162,25 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         }
         _topRatedMoviesList.addAll(moviesResponse.results);
         totalPagesForTopRatedMovies = moviesResponse.totalPages;
+        for (int i = 0; i < _topRatedMoviesList.length; i++) {
+          if (_topRatedMoviesList[i].genreIds.isNotEmpty) {
+            _genreListForTopRatedMovies.addAll(_topRatedMoviesList[i].genreIds);
+          }
+        }
+        _genreListForTopRatedMovies =
+            _genreListForTopRatedMovies.toSet().toList();
         emit(
           state.copyWith(
             status: Status.success,
             listOfTopRatedMovies: _topRatedMoviesList,
+            genreIdsForTopRated: _genreListForTopRatedMovies,
           ),
         );
         topRatedMoviesCurrentPage++;
+        // await _prefHelper.saveMoviesToPreferencesRequested(
+        //   listOfMovies: _topRatedMoviesList,
+        //   collectionName: SharedPreferencesConstants.topRatedMovies,
+        // );
         debugPrint(
             'After fetching API response current page value for the top rated movies = $topRatedMoviesCurrentPage');
       } else {
@@ -169,6 +203,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         'Before fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
     if (event.loadInitialPage ?? false) {
       upComingMoviesCurrentPage = 1;
+      _genreListForUpComingMovies = [];
       debugPrint(
           'First time fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
     }
@@ -190,13 +225,25 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         }
         _upComingMoviesList.addAll(moviesResponse.results);
         totalPagesForUpComingMovies = moviesResponse.totalPages;
+        for (int i = 0; i < _upComingMoviesList.length; i++) {
+          if (_upComingMoviesList[i].genreIds.isNotEmpty) {
+            _genreListForUpComingMovies.addAll(_upComingMoviesList[i].genreIds);
+          }
+        }
+        _genreListForUpComingMovies =
+            _genreListForUpComingMovies.toSet().toList();
         emit(
           state.copyWith(
             status: Status.success,
             listOfUpcomingMovies: _upComingMoviesList,
+            genreIdsForUpComing: _genreListForUpComingMovies,
           ),
         );
         upComingMoviesCurrentPage++;
+        // await _prefHelper.saveMoviesToPreferencesRequested(
+        //   listOfMovies: _upComingMoviesList,
+        //   collectionName: SharedPreferencesConstants.upComingMovies,
+        // );
         debugPrint(
             'After fetching API response current page value for the upcoming movies = $upComingMoviesCurrentPage');
       } else {
@@ -278,5 +325,85 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         );
       }
     }
+  }
+
+  FutureOr<void> _onApplyFilterRequested(
+    ApplyFilterRequested event,
+    Emitter<MovieState> emit,
+  ) {
+    if (event.filter.isNotEmpty || event.filter != '') {
+      if (state.tabBarStatus.popular) {
+        List<Movie> filteredMovieList = filterMovies(
+            filterType: event.filter, movieList: _popularMoviesList);
+        debugPrint(
+            'Length of the filtered movies == ${filteredMovieList.length}');
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfPopularMovies: filteredMovieList,
+          ),
+        );
+      } else if (state.tabBarStatus.topRated) {
+        List<Movie> filteredMovieList = filterMovies(
+            filterType: event.filter, movieList: _topRatedMoviesList);
+        debugPrint(
+            'Length of the filtered movies == ${filteredMovieList.length}');
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfTopRatedMovies: filteredMovieList,
+          ),
+        );
+      } else {
+        List<Movie> filteredMovieList = filterMovies(
+            filterType: event.filter, movieList: _upComingMoviesList);
+        debugPrint(
+            'Length of the filtered movies == ${filteredMovieList.length}');
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfUpcomingMovies: filteredMovieList,
+          ),
+        );
+      }
+    } else {
+      if (state.tabBarStatus.popular) {
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfPopularMovies: _popularMoviesList,
+          ),
+        );
+      } else if (state.tabBarStatus.topRated) {
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfTopRatedMovies: _topRatedMoviesList,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            status: Status.success,
+            listOfUpcomingMovies: _upComingMoviesList,
+          ),
+        );
+      }
+    }
+  }
+
+  List<Movie> filterMovies({
+    required List<Movie> movieList,
+    required filterType,
+  }) {
+    List<Movie> filteredMovieList = [];
+    for (final movie in movieList) {
+      for (final genreId in movie.genreIds) {
+        if (filterType == genreId.toString()) {
+          filteredMovieList.add(movie);
+        }
+      }
+    }
+    return filteredMovieList;
   }
 }

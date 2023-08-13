@@ -56,3 +56,11 @@ class UserSearchMovieRequested extends MovieEvent {
 
   final String movieName;
 }
+
+class ApplyFilterRequested extends MovieEvent {
+  const ApplyFilterRequested({
+    required this.filter,
+  });
+
+  final String filter;
+}

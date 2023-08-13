@@ -7,6 +7,7 @@ import 'package:movie_mania/screens/popular_movies_screen.dart';
 import 'package:movie_mania/screens/top_rated_movies_screen.dart';
 import 'package:movie_mania/screens/up_coming_movies_screen.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
+import 'package:movie_mania/widgets/filter_dialogue.dart';
 import 'package:movie_mania/widgets/unfocus_wrapper.dart';
 import 'package:sizer/sizer.dart';
 
@@ -105,32 +106,46 @@ class HomeScreen extends StatelessWidget {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-                child: TextField(
-                  controller: searchController,
-                  onChanged: (String movieName) {
-                    context.read<MovieBloc>().add(
-                          UserSearchMovieRequested(movieName: movieName),
-                        );
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search Movies...',
-                    hintStyle: const TextStyle(color: AppColors.blackColor),
-                    border: const OutlineInputBorder(),
-                    filled: true,
-                    fillColor: AppColors.whiteColor,
-                    suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              searchController.clear();
-                              context.read<MovieBloc>().add(
-                                    const UserSearchMovieRequested(
-                                        movieName: ''),
-                                  );
-                            },
-                          )
-                        : null,
-                  ),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: (String movieName) {
+                          context.read<MovieBloc>().add(
+                                UserSearchMovieRequested(movieName: movieName),
+                              );
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Search Movies...',
+                          hintStyle:
+                              const TextStyle(color: AppColors.blackColor),
+                          border: const OutlineInputBorder(),
+                          filled: true,
+                          fillColor: AppColors.whiteColor,
+                          suffixIcon: searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    searchController.clear();
+                                    context.read<MovieBloc>().add(
+                                          const UserSearchMovieRequested(
+                                              movieName: ''),
+                                        );
+                                  },
+                                )
+                              : null,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        filterDialogue(context: context);
+                      },
+                      padding: EdgeInsets.all(10.sp),
+                      icon: const Icon(Icons.filter_alt_rounded),
+                    ),
+                  ],
                 ),
               ),
               const Expanded(
