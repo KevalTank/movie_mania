@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/app_colors.dart';
 import 'package:movie_mania/models/movie/movie.dart';
+import 'package:movie_mania/screens/movie_details_screen.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
 import 'package:optimized_cached_image/optimized_cached_image.dart';
 import 'package:shimmer/shimmer.dart';
@@ -62,8 +62,11 @@ class _BuildGridViewState extends State<BuildGridView> {
         final movie = widget.listOfMovies[index];
         return GestureDetector(
           onTap: () {
-            // TODO : Implement this
-            Fluttertoast.showToast(msg: 'Coming soon');
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => MovieDetailsScreen(movie: movie),
+              ),
+            );
           },
           child: Stack(
             children: [
