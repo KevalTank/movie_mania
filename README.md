@@ -1,20 +1,23 @@
 # Movie Details App with BLoC (TMDB API)
 
 ### Packages used : 
-- **flutter_bloc** Dor the **state management**.
-- **sizer** For pixel **perfect UI**.
-- **get_it** and **injectable** For dependency injection.
-- **pretty_dio_logger** For logging.
-- **shared_preferences** For **Local storage**.
-- **optimized_cached_image**  to show the cache images that helps to show images quickly and improves user experience.
-- **shimmer** For the loading effect.
+- ```flutter_bloc``` Dor the ```state management```.
+- ```sizer``` For pixel ```perfect UI```.
+- ```get_it``` and ```injectable``` For dependency injection.
+- ```pretty_dio_logger``` For API call.
+- ```shared_preferences``` For ```Local storage```.
+- ```optimized_cached_image``` to show the cache images that helps to show images quickly and improves user experience.
+- ```shimmer``` For the loading effect.
 
 
 ### Features : 
-- API integration
+- API Integration
 - Pagination
-- Search movie
+- Search Movie
 - Uses simple shimmer like effect while fetching data from the APIs
+- Local Storage
+- Filateration
+- Change View
   
 ### APP Images : 
 <div>
