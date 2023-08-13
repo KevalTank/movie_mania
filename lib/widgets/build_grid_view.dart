@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/app_colors.dart';
 import 'package:movie_mania/models/movie/movie.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
+import 'package:optimized_cached_image/optimized_cached_image.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 class BuildGridView extends StatefulWidget {
@@ -14,7 +17,6 @@ class BuildGridView extends StatefulWidget {
 
   final List<Movie> listOfMovies;
   final VoidCallback onEndReached;
-
 
   @override
   State<BuildGridView> createState() => _BuildGridViewState();
@@ -63,18 +65,47 @@ class _BuildGridViewState extends State<BuildGridView> {
             // TODO : Implement this
             Fluttertoast.showToast(msg: 'Coming soon');
           },
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.greyColor,
-              borderRadius: BorderRadius.circular(15.sp),
-            ),
-            child: Center(
-              child: CustomText(
-                text: movie.title,
-                fontSize: 15.sp,
-                textColor: AppColors.blackColor,
+          child: Stack(
+            children: [
+              OptimizedCacheImage(
+                height: 100.h,
+                width: 100.w,
+                color: AppColors.whiteColor,
+                imageBuilder: (context, imageProvider) {
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteColor,
+                      borderRadius: BorderRadius.circular(15.sp),
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+                imageUrl: '${ApiConstants.movieImagePath}${movie.posterPath}',
+                placeholder: (context, url) => Shimmer.fromColors(
+                  baseColor: AppColors.greyColor[300]!,
+                  highlightColor: AppColors.greyColor[100]!,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteColor,
+                      borderRadius: BorderRadius.circular(15.sp),
+                    ),
+                  ),
+                ),
+                fit: BoxFit.cover,
               ),
-            ),
+              Positioned(
+                bottom: 1.h,
+                right: 2.w,
+                child: CustomText(
+                  text: 'Rating ⭐ : ${movie.voteAverage}',
+                  textColor: AppColors.whiteColor,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ],
           ),
         );
       },
