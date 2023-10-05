@@ -6,6 +6,7 @@ import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/enums.dart';
 import 'package:movie_mania/constants/shared_preferences_constants.dart';
 import 'package:movie_mania/local_storage/shared_pref_helper.dart';
+import 'package:movie_mania/models/genre/genre_model.dart';
 import 'package:movie_mania/models/movie/movie.dart';
 import 'package:movie_mania/repository/app_repository.dart';
 
@@ -27,6 +28,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     on<LoadUpcomingMoviesRequested>(_onLoadUpcomingMoviesRequested);
     on<UserSearchMovieRequested>(_onUserSearchMovieRequested);
     on<ApplyFilterRequested>(_onApplyFilterRequested);
+    on<GetGenresRequested>(_onGetGenresRequested);
   }
 
   // Created instants
@@ -86,14 +88,24 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         await _prefHelper.getMoviesListFromPreferencesRequested(
       collectionName: SharedPreferencesConstants.popularMovies,
     );
+    _popularMoviesList = listOfPopularMoviesFromPref;
     // If list of the popular movies is available
     // and its not calling for the first time then return the list from the preferences
     if (listOfPopularMoviesFromPref.isNotEmpty &&
         (event.loadInitialPage ?? false)) {
+      // Add the genre ids for the filtration
+      for (int i = 0; i < _popularMoviesList.length; i++) {
+        if (_popularMoviesList[i].genreIds.isNotEmpty) {
+          _genreListForPopularMovies.addAll(_popularMoviesList[i].genreIds);
+        }
+      }
+      // Removed the redundant genre ids from the list
+      _genreListForPopularMovies = _genreListForPopularMovies.toSet().toList();
       emit(
         state.copyWith(
           status: Status.success,
-          listOfPopularMovies: listOfPopularMoviesFromPref,
+          listOfPopularMovies: _popularMoviesList,
+          genreIdsForPopular: _genreListForPopularMovies,
         ),
       );
     }
@@ -182,14 +194,25 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         await _prefHelper.getMoviesListFromPreferencesRequested(
       collectionName: SharedPreferencesConstants.topRatedMovies,
     );
+    _topRatedMoviesList = listOfTopRatedMoviesFromPref;
     // If list of the top rated movies is available
     // and its not calling for the first time then return the list from the preferences
     if (listOfTopRatedMoviesFromPref.isNotEmpty &&
         (event.loadInitialPage ?? false)) {
+      // Add the genre ids for the filtration
+      for (int i = 0; i < _topRatedMoviesList.length; i++) {
+        if (_topRatedMoviesList[i].genreIds.isNotEmpty) {
+          _genreListForTopRatedMovies.addAll(_topRatedMoviesList[i].genreIds);
+        }
+      }
+      // Removed the redundant genre ids from the list
+      _genreListForTopRatedMovies =
+          _genreListForTopRatedMovies.toSet().toList();
       emit(
         state.copyWith(
           status: Status.success,
-          listOfTopRatedMovies: listOfTopRatedMoviesFromPref,
+          listOfTopRatedMovies: _topRatedMoviesList,
+          genreIdsForTopRated: _genreListForTopRatedMovies,
         ),
       );
     }
@@ -280,14 +303,25 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         await _prefHelper.getMoviesListFromPreferencesRequested(
       collectionName: SharedPreferencesConstants.upComingMovies,
     );
+    _upComingMoviesList = listOfUpComingMoviesFromPref;
     // If list of the up-coming movies is available
     // and its not calling for the first time then return the list from the preferences
     if (listOfUpComingMoviesFromPref.isNotEmpty &&
         (event.loadInitialPage ?? false)) {
+      // Add the genre ids for the filtration
+      for (int i = 0; i < _upComingMoviesList.length; i++) {
+        if (_upComingMoviesList[i].genreIds.isNotEmpty) {
+          _genreListForUpComingMovies.addAll(_upComingMoviesList[i].genreIds);
+        }
+      }
+      // Removed the redundant genre ids from the list
+      _genreListForUpComingMovies =
+          _genreListForUpComingMovies.toSet().toList();
       emit(
         state.copyWith(
           status: Status.success,
-          listOfUpcomingMovies: listOfUpComingMoviesFromPref,
+          listOfUpcomingMovies: _upComingMoviesList,
+          genreIdsForUpComing: _genreListForUpComingMovies,
         ),
       );
     }
@@ -552,16 +586,37 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
   // Helper method to filter the movies based on genre id
   List<Movie> filterMovies({
     required List<Movie> movieList,
-    required filterType,
+    required String filterType,
   }) {
     List<Movie> filteredMovieList = [];
     for (final movie in movieList) {
+      // Assuming genreIds is a list of genre IDs associated with the movie
       for (final genreId in movie.genreIds) {
-        if (filterType == genreId.toString()) {
+        // Find the corresponding GenreModel with the matching id
+        final genreModel = state.listOfGenreModel.firstWhere(
+          (genre) => genre.id == genreId,
+          orElse: () => GenreModel(id: -1, name: ''),
+        );
+        // Compare filterType with genreModel.name
+        if (filterType == genreModel.name) {
           filteredMovieList.add(movie);
         }
       }
     }
     return filteredMovieList;
+  }
+
+  FutureOr<void> _onGetGenresRequested(
+    GetGenresRequested event,
+    Emitter<MovieState> emit,
+  ) async {
+    emit(state.copyWith(status: Status.inProgress));
+    final listOfGenres = await _appRepository.getGenresRequested();
+    emit(
+      state.copyWith(
+        status: Status.success,
+        listOfGenreModel: listOfGenres,
+      ),
+    );
   }
 }

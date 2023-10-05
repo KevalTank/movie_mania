@@ -4,7 +4,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_mania/blocs/movie_bloc.dart';
-import 'package:movie_mania/constants/enums.dart';
+import 'package:movie_mania/models/genre/genre_model.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
 import 'package:movie_mania/widgets/gap.dart';
 import 'package:sizer/sizer.dart';
@@ -13,21 +13,7 @@ import 'package:sizer/sizer.dart';
 Future<void> filterDialogue({
   required BuildContext context,
 }) async {
-  // Get the current tab bar status
-  var tabStatus = context.read<MovieBloc>().state.tabBarStatus.name;
-  List<int> genreIds = [];
-  // Get popular list's genre ids
-  if (tabStatus == TabBarStatus.popular.name) {
-    genreIds = context.read<MovieBloc>().state.genreIdsForPopular;
-  }
-  // Get top rated list's genre ids
-  else if (tabStatus == TabBarStatus.topRated.name) {
-    genreIds = context.read<MovieBloc>().state.genreIdsForTopRated;
-  }
-  // Get up-coming list's genre ids
-  else {
-    genreIds = context.read<MovieBloc>().state.genreIdsForUpComing;
-  }
+  var listOfGenreModel = context.read<MovieBloc>().state.listOfGenreModel;
   await showDialog(
     context: context,
     barrierDismissible: false,
@@ -36,14 +22,15 @@ Future<void> filterDialogue({
       return BlocProvider.value(
         value: movieBloc,
         child: FilterDialogue(
-          optionsTitle: 'Genre List',
-          optionsList: genreIds,
-          selectedOption: genreIds.isNotEmpty ? genreIds[0].toString() : null,
+          optionsTitle: listOfGenreModel.first,
+          optionsList: listOfGenreModel,
+          selectedOption: listOfGenreModel.isNotEmpty ? listOfGenreModel.first : null,
           onApplyFilter: (String? selectedOption) {
+            debugPrint('Selected option for the filter === $selectedOption');
             // Apply filter
             context.read<MovieBloc>().add(
                   ApplyFilterRequested(
-                    filter: selectedOption.toString(),
+                    filter: selectedOption ?? 'Horror',
                   ),
                 );
           },
@@ -70,9 +57,9 @@ class FilterDialogue extends StatefulWidget {
     required this.onClearFilter,
   });
 
-  final String optionsTitle;
-  final List<int> optionsList;
-  final String? selectedOption;
+  final GenreModel optionsTitle;
+  final List<GenreModel> optionsList;
+  final GenreModel? selectedOption;
   final void Function(String? selectedOption) onApplyFilter;
   final void Function() onClearFilter;
 
@@ -86,7 +73,7 @@ class _FilterDialogueState extends State<FilterDialogue> {
   @override
   void initState() {
     super.initState();
-    selectedDropdownOption = widget.selectedOption;
+    selectedDropdownOption = widget.selectedOption?.name;
   }
 
   final alertBoxFilter = ImageFilter.blur(sigmaX: 10, sigmaY: 10);
@@ -110,6 +97,7 @@ class _FilterDialogueState extends State<FilterDialogue> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Gap(),
+                  const CustomText(text: 'Select Genre'),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 3.w),
                     margin: EdgeInsets.only(
@@ -124,7 +112,6 @@ class _FilterDialogueState extends State<FilterDialogue> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const CustomText(text: 'Select Genre'),
                         DropdownButton2(
                           dropdownDecoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.sp),
@@ -138,16 +125,17 @@ class _FilterDialogueState extends State<FilterDialogue> {
                               const Icon(Icons.keyboard_arrow_up_rounded),
                           underline: Container(),
                           isExpanded: true,
-                          hint: CustomText(text: widget.optionsTitle),
+                          hint: CustomText(text: widget.optionsTitle.name),
                           value: selectedDropdownOption,
-                          items: widget.optionsList.map((int item) {
+                          items: widget.optionsList.map((item) {
                             return DropdownMenuItem(
-                              value: item.toString(),
-                              child: Text(item.toString()),
+                              value: item.name,
+                              child: Text(item.name.toString()),
                             );
                           }).toList(),
                           onChanged: (String? newValue) {
-                            setState(() => selectedDropdownOption = newValue);
+                            debugPrint('New selected value === ${newValue.toString()}');
+                           setState(() => selectedDropdownOption = newValue);
                           },
                         ),
                       ],

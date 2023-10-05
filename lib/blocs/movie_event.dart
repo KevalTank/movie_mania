@@ -72,3 +72,8 @@ class ApplyFilterRequested extends MovieEvent {
 
   final String filter;
 }
+
+// Get Genres
+class GetGenresRequested extends MovieEvent {
+  const GetGenresRequested();
+}

@@ -4,7 +4,7 @@
 
 
 ### Packages used : 
-- ```flutter_bloc``` Dor the ```state management```.
+- ```flutter_bloc``` For the ```state management```.
 - ```sizer``` For pixel ```perfect UI```.
 - ```get_it``` and ```injectable``` For dependency injection.
 - ```pretty_dio_logger``` For API call.
@@ -19,7 +19,7 @@
 - Search Movie
 - Uses simple shimmer like effect while fetching data from the APIs
 - Local Storage
-- Filateration
+- Filtration
 - Change View
   
 ### APP Images : 
@@ -32,4 +32,3 @@
   <img src= https://github.com/KevalTank/movie_mania/assets/70793545/a4ce52a4-ead4-47b9-986f-e696ef4a8729 width=300>
   <img src= https://github.com/KevalTank/movie_mania/assets/70793545/b5abe11c-16e3-4ed4-9c3a-56e4aa40cf4e width=300>
 </div>
-<div>

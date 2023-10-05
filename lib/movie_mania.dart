@@ -24,7 +24,8 @@ class MovieMania extends StatelessWidget {
               MovieBloc(appRepository: _appRepository, prefHelper: _prefHelper)
                 ..add(const LoadPopularMoviesRequested(loadInitialPage: true))
                 ..add(const LoadTopRatedMoviesRequested(loadInitialPage: true))
-                ..add(const LoadUpcomingMoviesRequested(loadInitialPage: true)),
+                ..add(const LoadUpcomingMoviesRequested(loadInitialPage: true))
+                ..add(const GetGenresRequested()),
           lazy: false,
         ),
       ],

@@ -13,6 +13,7 @@ class MovieState extends Equatable {
     this.genreIdsForPopular = const [],
     this.genreIdsForTopRated = const [],
     this.genreIdsForUpComing = const [],
+    this.listOfGenreModel = const [],
   });
 
   final Status status;
@@ -25,6 +26,7 @@ class MovieState extends Equatable {
   final List<int> genreIdsForPopular;
   final List<int> genreIdsForTopRated;
   final List<int> genreIdsForUpComing;
+  final List<GenreModel> listOfGenreModel;
 
   MovieState copyWith({
     Status? status,
@@ -37,6 +39,7 @@ class MovieState extends Equatable {
     List<int>? genreIdsForPopular,
     List<int>? genreIdsForTopRated,
     List<int>? genreIdsForUpComing,
+    List<GenreModel>? listOfGenreModel,
   }) {
     return MovieState(
       status: status ?? this.status,
@@ -49,6 +52,7 @@ class MovieState extends Equatable {
       genreIdsForPopular: genreIdsForPopular ?? this.genreIdsForPopular,
       genreIdsForTopRated: genreIdsForTopRated ?? this.genreIdsForTopRated,
       genreIdsForUpComing: genreIdsForUpComing ?? this.genreIdsForUpComing,
+      listOfGenreModel: listOfGenreModel ?? this.listOfGenreModel,
     );
   }
 
@@ -64,5 +68,6 @@ class MovieState extends Equatable {
         genreIdsForPopular,
         genreIdsForTopRated,
         genreIdsForUpComing,
+        listOfGenreModel,
       ];
 }
