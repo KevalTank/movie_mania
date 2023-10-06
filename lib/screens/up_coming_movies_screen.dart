@@ -24,27 +24,44 @@ class UpComingMoviesScreen extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: () async {
               // Load up-coming movies
-              context.read<MovieBloc>().add(
-                    const LoadUpcomingMoviesRequested(loadInitialPage: true),
-                  );
+              if (state.connected) {
+                context.read<MovieBloc>().add(
+                      const LoadUpcomingMoviesRequested(loadInitialPage: true),
+                    );
+              } else {
+                Fluttertoast.showToast(
+                    msg: 'To load more movies please connect to the network');
+              }
             },
             child: state.isGridView
                 ? BuildGridView(
                     listOfMovies: state.listOfUpcomingMovies,
                     onEndReached: () {
                       // Load more movies
-                      context
-                          .read<MovieBloc>()
-                          .add(const LoadUpcomingMoviesRequested());
+                      if (state.connected) {
+                        context
+                            .read<MovieBloc>()
+                            .add(const LoadUpcomingMoviesRequested());
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                'To load more movies please connect to the network');
+                      }
                     },
                   )
                 : BuildListView(
                     listOfMovies: state.listOfUpcomingMovies,
                     onEndReached: () {
                       // Load more movies
-                      context
-                          .read<MovieBloc>()
-                          .add(const LoadUpcomingMoviesRequested());
+                      if (state.connected) {
+                        context
+                            .read<MovieBloc>()
+                            .add(const LoadUpcomingMoviesRequested());
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                'To load more movies please connect to the network');
+                      }
                     },
                   ),
           );

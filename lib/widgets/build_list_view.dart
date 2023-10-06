@@ -97,6 +97,15 @@ class _BuildListViewState extends State<BuildListView> {
                       },
                       imageUrl:
                           '${ApiConstants.movieImagePath}${movie.posterPath}',
+                      errorWidget: (context, _, val) => Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.greyColor.shade300,
+                          borderRadius: BorderRadius.circular(15.sp),
+                        ),
+                        child: const Center(
+                          child: CustomText(text: 'No, Image found'),
+                        ),
+                      ),
                       placeholder: (context, url) => Shimmer.fromColors(
                         baseColor: AppColors.greyColor[300]!,
                         highlightColor: AppColors.greyColor[100]!,

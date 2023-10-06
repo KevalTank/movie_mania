@@ -16,35 +16,53 @@ class TopRatedMoviesScreen extends StatelessWidget {
         buildWhen: (previous, current) =>
             previous.status != current.status ||
             previous.isGridView != current.isGridView ||
-            previous.listOfTopRatedMovies != current.listOfTopRatedMovies,
+            previous.listOfTopRatedMovies != current.listOfTopRatedMovies ||
+            previous.connected != current.connected,
         builder: (context, state) {
-          if(state.status.isFailure) {
+          if (state.status.isFailure) {
             Fluttertoast.showToast(msg: state.errorMessage);
           }
           return RefreshIndicator(
             onRefresh: () async {
               // Load top rated movies
-              context.read<MovieBloc>().add(
-                    const LoadTopRatedMoviesRequested(loadInitialPage: true),
-                  );
+              if (state.connected) {
+                context.read<MovieBloc>().add(
+                      const LoadTopRatedMoviesRequested(loadInitialPage: true),
+                    );
+              } else {
+                Fluttertoast.showToast(
+                    msg: 'To load more movies please connect to the network');
+              }
             },
             child: state.isGridView
                 ? BuildGridView(
                     listOfMovies: state.listOfTopRatedMovies,
                     onEndReached: () {
                       // Load more movies
-                      context
-                          .read<MovieBloc>()
-                          .add(const LoadTopRatedMoviesRequested());
+                      if (state.connected) {
+                        context
+                            .read<MovieBloc>()
+                            .add(const LoadTopRatedMoviesRequested());
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                'To load more movies please connect to the network');
+                      }
                     },
                   )
                 : BuildListView(
                     listOfMovies: state.listOfTopRatedMovies,
                     onEndReached: () {
                       // Load more movies
-                      context
-                          .read<MovieBloc>()
-                          .add(const LoadTopRatedMoviesRequested());
+                      if (state.connected) {
+                        context
+                            .read<MovieBloc>()
+                            .add(const LoadTopRatedMoviesRequested());
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                'To load more movies please connect to the network');
+                      }
                     },
                   ),
           );

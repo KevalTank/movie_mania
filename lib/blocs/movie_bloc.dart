@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/enums.dart';
@@ -29,11 +31,16 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     on<UserSearchMovieRequested>(_onUserSearchMovieRequested);
     on<ApplyFilterRequested>(_onApplyFilterRequested);
     on<GetGenresRequested>(_onGetGenresRequested);
+    on<CheckNetworkConnectivity>(_onCheckNetworkConnectivity);
+    on<UpdateConnectivityStatusRequested>(_onUpdateConnectivityStatusRequested);
   }
 
   // Created instants
   final AppRepository _appRepository;
   final SharedPrefHelper _prefHelper;
+
+  // Check connectivity
+  Connectivity connectivity = Connectivity();
 
   // Holds the index for calling API
   int popularMoviesCurrentPage = 1;
@@ -618,5 +625,30 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         listOfGenreModel: listOfGenres,
       ),
     );
+  }
+
+  FutureOr<void> _onCheckNetworkConnectivity(
+    CheckNetworkConnectivity event,
+    Emitter<MovieState> emit,
+  ) async {
+    connectivity.onConnectivityChanged.listen(
+      (result) {
+        if (result == ConnectivityResult.mobile ||
+            result == ConnectivityResult.wifi) {
+          debugPrint('Connected');
+          add(const UpdateConnectivityStatusRequested(connected: true));
+        } else {
+          debugPrint('Dis Connected');
+          add(const UpdateConnectivityStatusRequested(connected: false));
+        }
+      },
+    );
+  }
+
+  FutureOr<void> _onUpdateConnectivityStatusRequested(
+    UpdateConnectivityStatusRequested event,
+    Emitter<MovieState> emit,
+  ) {
+    emit(state.copyWith(connected: event.connected));
   }
 }

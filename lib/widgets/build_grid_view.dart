@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/app_colors.dart';
+import 'package:movie_mania/constants/assets.dart';
 import 'package:movie_mania/models/movie/movie.dart';
 import 'package:movie_mania/screens/movie_details_screen.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
@@ -91,6 +92,11 @@ class _BuildGridViewState extends State<BuildGridView> {
                   );
                 },
                 imageUrl: '${ApiConstants.movieImagePath}${movie.posterPath}',
+                errorWidget: (context, _, val) => Image.asset(
+                  Assets.noImageFound,
+                  height: 100.h,
+                  width: 100.w,
+                ),
                 placeholder: (context, url) => Shimmer.fromColors(
                   baseColor: AppColors.greyColor[300]!,
                   highlightColor: AppColors.greyColor[100]!,

@@ -16,7 +16,8 @@ class PopularMoviesScreen extends StatelessWidget {
         buildWhen: (previous, current) =>
             previous.status != current.status ||
             previous.isGridView != current.isGridView ||
-            previous.listOfPopularMovies != current.listOfPopularMovies,
+            previous.listOfPopularMovies != current.listOfPopularMovies ||
+            previous.connected != current.connected,
         builder: (context, state) {
           if (state.status.isFailure) {
             Fluttertoast.showToast(msg: state.errorMessage);
@@ -24,27 +25,44 @@ class PopularMoviesScreen extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: () async {
               // Load popular movies
-              context.read<MovieBloc>().add(
-                    const LoadPopularMoviesRequested(loadInitialPage: true),
-                  );
+              if (state.connected) {
+                context.read<MovieBloc>().add(
+                      const LoadPopularMoviesRequested(loadInitialPage: true),
+                    );
+              } else {
+                Fluttertoast.showToast(
+                    msg: 'To load more movies please connect to the network');
+              }
             },
             child: state.isGridView
                 ? BuildGridView(
                     listOfMovies: state.listOfPopularMovies,
                     onEndReached: () {
                       // Load more movies
-                      context
-                          .read<MovieBloc>()
-                          .add(const LoadPopularMoviesRequested());
+                      if (state.connected) {
+                        context
+                            .read<MovieBloc>()
+                            .add(const LoadPopularMoviesRequested());
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                'To load more movies please connect to the network');
+                      }
                     },
                   )
                 : BuildListView(
                     listOfMovies: state.listOfPopularMovies,
                     onEndReached: () {
                       // Load more movies
-                      context
-                          .read<MovieBloc>()
-                          .add(const LoadPopularMoviesRequested());
+                      if (state.connected) {
+                        context
+                            .read<MovieBloc>()
+                            .add(const LoadPopularMoviesRequested());
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                'To load more movies please connect to the network');
+                      }
                     },
                   ),
           );

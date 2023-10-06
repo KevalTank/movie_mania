@@ -24,6 +24,7 @@ dependencies:
   dropdown_button2: ^1.9.1
   optimized_cached_image: ^3.0.1
   shimmer: ^3.0.0
+  connectivity_plus: ^4.0.2
 
 dev_dependencies:
   flutter_test:

@@ -77,3 +77,17 @@ class ApplyFilterRequested extends MovieEvent {
 class GetGenresRequested extends MovieEvent {
   const GetGenresRequested();
 }
+
+// Check network connectivity
+class CheckNetworkConnectivity extends MovieEvent {
+  const CheckNetworkConnectivity();
+}
+
+// Update connectivity status
+class UpdateConnectivityStatusRequested extends MovieEvent {
+  const UpdateConnectivityStatusRequested({
+    required this.connected,
+});
+
+  final bool connected;
+}

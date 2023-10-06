@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/app_colors.dart';
+import 'package:movie_mania/constants/assets.dart';
 import 'package:movie_mania/models/movie/movie.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
 import 'package:movie_mania/widgets/gap.dart';
@@ -47,6 +48,15 @@ class MovieDetailsScreen extends StatelessWidget {
                       ),
                     );
                   },
+                  errorWidget: (context, _, val) => Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.sp),
+                      image: const DecorationImage(
+                        fit: BoxFit.contain,
+                        image: AssetImage(Assets.noImageFound),
+                      ),
+                    ),
+                  ),
                   imageUrl: '${ApiConstants.movieImagePath}${movie.posterPath}',
                   placeholder: (context, url) => Shimmer.fromColors(
                     baseColor: AppColors.greyColor[300]!,
