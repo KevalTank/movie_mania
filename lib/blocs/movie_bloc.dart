@@ -508,12 +508,12 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     Emitter<MovieState> emit,
   ) {
     // Check if the applied filter is not empty
-    if (event.filter.isNotEmpty || event.filter != '') {
+    if (event.filterList.isNotEmpty) {
       // Check the tab bar for popular
       if (state.tabBarStatus.popular) {
         // Filter movies based on genre Id
         List<Movie> filteredMovieList = filterMovies(
-          filterType: event.filter,
+          listOfFilters: event.filterList,
           movieList: _popularMoviesList,
         );
         // Update state
@@ -526,12 +526,12 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
       }
       // Check the tab bar for top rated
       else if (state.tabBarStatus.topRated) {
-        // Filter movies based on genre Id
+        //Filter movies based on genre Id
         List<Movie> filteredMovieList = filterMovies(
-          filterType: event.filter,
+          listOfFilters: event.filterList,
           movieList: _topRatedMoviesList,
         );
-        // Update state
+        //Update state
         emit(
           state.copyWith(
             status: Status.success,
@@ -543,7 +543,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
       else {
         // Filter movies
         List<Movie> filteredMovieList = filterMovies(
-          filterType: event.filter,
+          listOfFilters: event.filterList,
           movieList: _upComingMoviesList,
         );
         // Update state
@@ -555,7 +555,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         );
       }
     }
-    // Handle case for search text is empty
+    // Handle case for filter list is empty
     else {
       // Check tab bar for popular
       if (state.tabBarStatus.popular) {
@@ -590,26 +590,33 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     }
   }
 
-  // Helper method to filter the movies based on genre id
+// Helper method to filter the movies based on a list of genre names
   List<Movie> filterMovies({
+    required List<GenreModel> listOfFilters,
     required List<Movie> movieList,
-    required String filterType,
   }) {
     List<Movie> filteredMovieList = [];
+
     for (final movie in movieList) {
-      // Assuming genreIds is a list of genre IDs associated with the movie
-      for (final genreId in movie.genreIds) {
-        // Find the corresponding GenreModel with the matching id
-        final genreModel = state.listOfGenreModel.firstWhere(
-          (genre) => genre.id == genreId,
-          orElse: () => GenreModel(id: -1, name: ''),
-        );
-        // Compare filterType with genreModel.name
-        if (filterType == genreModel.name) {
-          filteredMovieList.add(movie);
-        }
+      final movieGenreNames = movie.genreIds
+          .map((genreId) {
+            final genreModel = state.listOfGenreModel.firstWhere(
+              (genre) => genre.id == genreId,
+              orElse: () => GenreModel(id: -1, name: ''),
+            );
+            return genreModel.name;
+          })
+          .where((name) => name.isNotEmpty)
+          .toSet()
+          .toList();
+
+      // Check if any selected filter matches the movie's genres
+      if (listOfFilters
+          .any((filter) => movieGenreNames.contains(filter.name))) {
+        filteredMovieList.add(movie);
       }
     }
+
     return filteredMovieList;
   }
 

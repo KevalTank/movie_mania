@@ -67,10 +67,10 @@ class UserSearchMovieRequested extends MovieEvent {
 // Apply filters
 class ApplyFilterRequested extends MovieEvent {
   const ApplyFilterRequested({
-    required this.filter,
+    required this.filterList,
   });
 
-  final String filter;
+  final List<GenreModel> filterList;
 }
 
 // Get Genres
@@ -87,7 +87,7 @@ class CheckNetworkConnectivity extends MovieEvent {
 class UpdateConnectivityStatusRequested extends MovieEvent {
   const UpdateConnectivityStatusRequested({
     required this.connected,
-});
+  });
 
   final bool connected;
 }
