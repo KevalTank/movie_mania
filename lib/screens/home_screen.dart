@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_mania/blocs/movie_bloc.dart';
 import 'package:movie_mania/constants/app_colors.dart';
+import 'package:movie_mania/constants/app_strings.dart';
 import 'package:movie_mania/constants/enums.dart';
 import 'package:movie_mania/screens/popular_movies_screen.dart';
 import 'package:movie_mania/screens/top_rated_movies_screen.dart';
@@ -98,9 +99,9 @@ class HomeScreen extends StatelessWidget {
                 }
               },
               tabs: const [
-                Tab(icon: Text('Popular')),
-                Tab(icon: Text('Top Rated')),
-                Tab(icon: Text('Upcoming')),
+                Tab(icon: Text(AppStrings.popular)),
+                Tab(icon: Text(AppStrings.topRated)),
+                Tab(icon: Text(AppStrings.upComing)),
               ],
             ),
           ),
@@ -120,7 +121,7 @@ class HomeScreen extends StatelessWidget {
                               );
                         },
                         decoration: InputDecoration(
-                          hintText: 'Search Movies...',
+                          hintText: AppStrings.searchMovies,
                           hintStyle:
                               const TextStyle(color: AppColors.blackColor),
                           border: const OutlineInputBorder(),

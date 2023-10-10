@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/app_colors.dart';
+import 'package:movie_mania/constants/app_strings.dart';
 import 'package:movie_mania/constants/assets.dart';
 import 'package:movie_mania/models/movie/movie.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
@@ -72,7 +73,7 @@ class MovieDetailsScreen extends StatelessWidget {
               ),
               Gap(height: 1.h),
               CustomText(
-                text: 'Overview : ',
+                text: '${AppStrings.overView} : ',
                 fontSize: 14.sp,
                 textColor: AppColors.blackColor,
                 fontWeight: FontWeight.w600,
@@ -85,22 +86,22 @@ class MovieDetailsScreen extends StatelessWidget {
               ),
               Gap(height: 1.h),
               BuildMovieInfoWithTitle(
-                title: 'Language',
+                title: AppStrings.language,
                 description: movie.originalLanguage.toUpperCase(),
               ),
               Gap(height: 1.h),
               BuildMovieInfoWithTitle(
-                title: 'Vote',
+                title: AppStrings.vote,
                 description: movie.voteCount.toString(),
               ),
               Gap(height: 1.h),
               BuildMovieInfoWithTitle(
-                title: 'Rating',
+                title: AppStrings.rating,
                 description: '${movie.voteAverage} :⭐',
               ),
               Gap(height: 1.h),
               BuildMovieInfoWithTitle(
-                title: 'Release Date',
+                title: AppStrings.releaseDate,
                 description: movie.releaseDate,
               ),
               const Gap(),
@@ -111,7 +112,7 @@ class MovieDetailsScreen extends StatelessWidget {
       // FAB
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Fluttertoast.showToast(msg: 'Book Ticket');
+          Fluttertoast.showToast(msg: AppStrings.bookTicket);
         },
         child: const Icon(Icons.movie),
       ),

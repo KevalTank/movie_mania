@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/app_colors.dart';
+import 'package:movie_mania/constants/app_strings.dart';
 import 'package:movie_mania/models/movie/movie.dart';
 import 'package:movie_mania/screens/movie_details_screen.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
@@ -103,7 +104,7 @@ class _BuildListViewState extends State<BuildListView> {
                           borderRadius: BorderRadius.circular(15.sp),
                         ),
                         child: const Center(
-                          child: CustomText(text: 'No, Image found'),
+                          child: CustomText(text: AppStrings.noImageFound),
                         ),
                       ),
                       placeholder: (context, url) => Shimmer.fromColors(
@@ -127,7 +128,8 @@ class _BuildListViewState extends State<BuildListView> {
                     children: [
                       CustomText(text: movie.title),
                       const Gap(),
-                      CustomText(text: 'Rating ⭐ : ${movie.voteAverage}')
+                      CustomText(
+                          text: '${AppStrings.rating} ⭐ : ${movie.voteAverage}')
                     ],
                   ),
                 ),
