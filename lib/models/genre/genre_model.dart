@@ -9,10 +9,12 @@ part 'genre_model.g.dart';
 class GenreModel {
   final int id;
   final String name;
+  bool selected;
 
   GenreModel({
     required this.id,
     required this.name,
+    this.selected = false,
   });
 
   factory GenreModel.fromJson(Map<String, dynamic> json) =>
