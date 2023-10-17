@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_mania/blocs/movie_bloc.dart';
 import 'package:movie_mania/constants/app_colors.dart';
+import 'package:movie_mania/constants/app_strings.dart';
 import 'package:movie_mania/models/genre/genre_model.dart';
 import 'package:movie_mania/widgets/custom_text.dart';
 import 'package:movie_mania/widgets/gap.dart';
@@ -38,7 +39,7 @@ Future<void> filterDialogue({
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Gap(),
-                        const CustomText(text: 'Select Genres'),
+                        const CustomText(text: AppStrings.selectGenres),
                         Gap(height: 1.h),
                         Container(
                           decoration: BoxDecoration(
@@ -89,7 +90,9 @@ Future<void> filterDialogue({
                                     );
                                 Navigator.of(context).pop();
                               },
-                              child: const CustomText(text: 'Clear Filter'),
+                              child: const CustomText(
+                                text: AppStrings.clearFilters,
+                              ),
                             ),
                             const Gap(),
                             ElevatedButton(
@@ -100,7 +103,7 @@ Future<void> filterDialogue({
                                     );
                                 Navigator.of(context).pop();
                               },
-                              child: const CustomText(text: 'Apply'),
+                              child: const CustomText(text: AppStrings.apply),
                             ),
                           ],
                         ),

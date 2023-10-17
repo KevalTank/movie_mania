@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_mania/constants/api_constants.dart';
 import 'package:movie_mania/constants/app_colors.dart';
+import 'package:movie_mania/constants/app_strings.dart';
 import 'package:movie_mania/constants/assets.dart';
 import 'package:movie_mania/models/movie/movie.dart';
 import 'package:movie_mania/screens/movie_details_screen.dart';
@@ -113,7 +114,7 @@ class _BuildGridViewState extends State<BuildGridView> {
                 bottom: 1.h,
                 right: 2.w,
                 child: CustomText(
-                  text: 'Rating ⭐ : ${movie.voteAverage}',
+                  text: '${AppStrings.rating} ⭐ : ${movie.voteAverage}',
                   textColor: AppColors.whiteColor,
                   fontSize: 14.sp,
                 ),

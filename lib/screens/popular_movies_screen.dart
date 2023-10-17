@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:movie_mania/blocs/movie_bloc.dart';
+import 'package:movie_mania/constants/app_strings.dart';
 import 'package:movie_mania/constants/enums.dart';
 import 'package:movie_mania/widgets/build_grid_view.dart';
 import 'package:movie_mania/widgets/build_list_view.dart';
@@ -31,7 +32,8 @@ class PopularMoviesScreen extends StatelessWidget {
                     );
               } else {
                 Fluttertoast.showToast(
-                    msg: 'To load more movies please connect to the network');
+                  msg: AppStrings.toLoadMoreMoviesPleaseConnectToTheNetwork,
+                );
               }
             },
             child: state.isGridView
@@ -45,8 +47,9 @@ class PopularMoviesScreen extends StatelessWidget {
                             .add(const LoadPopularMoviesRequested());
                       } else {
                         Fluttertoast.showToast(
-                            msg:
-                                'To load more movies please connect to the network');
+                          msg: AppStrings
+                              .toLoadMoreMoviesPleaseConnectToTheNetwork,
+                        );
                       }
                     },
                   )
@@ -60,8 +63,9 @@ class PopularMoviesScreen extends StatelessWidget {
                             .add(const LoadPopularMoviesRequested());
                       } else {
                         Fluttertoast.showToast(
-                            msg:
-                                'To load more movies please connect to the network');
+                          msg: AppStrings
+                              .toLoadMoreMoviesPleaseConnectToTheNetwork,
+                        );
                       }
                     },
                   ),

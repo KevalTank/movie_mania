@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_mania/blocs/movie_bloc.dart';
 import 'package:movie_mania/configurations/configure_dependencies.dart';
+import 'package:movie_mania/constants/app_strings.dart';
 import 'package:movie_mania/local_storage/shared_pref_helper.dart';
 import 'package:movie_mania/repository/app_repository.dart';
 import 'package:movie_mania/screens/home_screen.dart';
@@ -34,7 +35,7 @@ class MovieMania extends StatelessWidget {
       child: Sizer(
         builder: (context, orientation, deviceType) {
           return MaterialApp(
-            title: 'Movie Mania',
+            title: AppStrings.movieMania,
             theme: ThemeData.light(useMaterial3: true),
             home: HomeScreen(),
           );

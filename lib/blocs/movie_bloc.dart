@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_mania/constants/api_constants.dart';
+import 'package:movie_mania/constants/app_strings.dart';
 import 'package:movie_mania/constants/enums.dart';
 import 'package:movie_mania/constants/shared_preferences_constants.dart';
 import 'package:movie_mania/local_storage/shared_pref_helper.dart';
@@ -130,7 +131,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         emit(
           state.copyWith(
             status: Status.failure,
-            errorMessage: 'You have reached to the end of the list',
+            errorMessage: AppStrings.keyYouHaveReachedToTheEndOfTheList,
           ),
         );
       }
@@ -182,7 +183,9 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
           emit(
             state.copyWith(
               status: Status.failure,
-              errorMessage: 'Something went wrong while loading popular movies',
+              errorMessage: AppStrings.keySomethingWentWrongWhileLoadingMovies(
+                movies: AppStrings.popular,
+              ),
             ),
           );
         }
@@ -237,7 +240,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         emit(
           state.copyWith(
             status: Status.failure,
-            errorMessage: 'You have reached to the end of the list',
+            errorMessage: AppStrings.keyYouHaveReachedToTheEndOfTheList,
           ),
         );
       }
@@ -290,8 +293,9 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
           emit(
             state.copyWith(
               status: Status.failure,
-              errorMessage:
-                  'Something went wrong while loading top rated movies',
+              errorMessage: AppStrings.keySomethingWentWrongWhileLoadingMovies(
+                movies: AppStrings.topRated,
+              ),
             ),
           );
         }
@@ -346,7 +350,7 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
         emit(
           state.copyWith(
             status: Status.failure,
-            errorMessage: 'You have reached to the end of the list',
+            errorMessage: AppStrings.keyYouHaveReachedToTheEndOfTheList,
           ),
         );
       }
@@ -399,8 +403,9 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
           emit(
             state.copyWith(
               status: Status.failure,
-              errorMessage:
-                  'Something went wrong while loading upcoming movies',
+              errorMessage: AppStrings.keySomethingWentWrongWhileLoadingMovies(
+                movies: AppStrings.upComing,
+              ),
             ),
           );
         }
